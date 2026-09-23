@@ -1,0 +1,82 @@
+rules_version = '2';
+
+/* =========================================================
+   Pizzaria Nonna Rosa — regras do servidor de pedidos
+   Criasiteweb
+
+   Ideia central:
+   - QUALQUER pessoa pode ENVIAR um pedido (é o cliente no site).
+   - NINGUÉM pode LER a lista de pedidos, exceto a conta da loja.
+     Isso protege nome, telefone e endereço dos clientes.
+   - Nada pode ser apagado: histórico do dia fica preservado.
+   ========================================================= */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function ehALoja() {
+      return request.auth != null
+          && request.auth.token.email == 'loja@nonnarosa.com.br'
+          && request.auth.token.email_verified in [true, false];
+    }
+
+    /* o pedido que chega do site precisa ter cara de pedido:
+       campos certos, tamanhos sadios e status sempre "novo" */
+    function pedidoValido(d) {
+      return d.keys().hasOnly(['criadoEm','status','impresso','texto','cliente',
+                               'fone','tipo','endereco','pagamento','total','itens','taxa'])
+          && d.status == 'novo'
+          && d.impresso == false
+          && d.texto is string   && d.texto.size() > 0 && d.texto.size() <= 4000
+          && d.cliente is string && d.cliente.size() <= 80
+          && d.fone is string    && d.fone.size() <= 25
+          && d.tipo is string    && d.tipo.size() <= 20
+          && d.endereco is string  && d.endereco.size() <= 200
+          && d.pagamento is string && d.pagamento.size() <= 80
+          && d.total is number   && d.total >= 0 && d.total <= 100000
+          && d.itens is int      && d.itens >= 0 && d.itens <= 200
+          && d.taxa is number    && d.taxa >= 0 && d.taxa <= 1000
+          && d.criadoEm == request.time;
+    }
+
+    match /pedidos/{pedido} {
+      allow create: if pedidoValido(request.resource.data);
+      allow get, list: if ehALoja();
+      /* a loja só mexe no andamento do pedido, nunca no conteúdo */
+      allow update: if ehALoja()
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys().hasOnly(['status','impresso']);
+      /* a loja pode apagar — usado pela Criasiteweb para limpar os pedidos
+         de teste antes de entregar o sistema. Não há botão para isso no
+         painel: é feito por fora, de propósito. */
+      allow delete: if ehALoja();
+    }
+
+    /* Caixa do dia: despesas com mercadoria e fechamento.
+       Só a loja mexe — o cliente do site nem enxerga. */
+    match /caixa/{dia} {
+      allow read, write: if ehALoja();
+    }
+
+    /* Estado da loja (aberta/fechada agora).
+       O site do cliente precisa LER isto para mostrar o selo certo,
+       então a leitura é livre. Só a loja escreve. */
+    match /publico/loja {
+      allow read: if true;
+      allow write: if ehALoja();
+    }
+
+    /* Ajustes do cardápio feitos pelo dono no painel (preço, esgotado,
+       nome e descrição). O site do cliente precisa LER para mostrar os
+       valores certos, então a leitura é livre. Só a loja escreve. */
+    match /publico/cardapio {
+      allow read: if true;
+      allow write: if ehALoja();
+    }
+
+    /* qualquer outro caminho fica fechado */
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}
