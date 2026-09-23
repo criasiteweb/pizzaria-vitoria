@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — Painel de Pedidos (painel.html)
+   Pizzaria Vitória — Painel de Pedidos (painel.html)
    Criasiteweb
 
    O pedido sai do site do cliente e cai aqui na hora.
@@ -130,21 +130,21 @@ function comecarInsistencia() {
     const temNovo = pedidos.some(p => p.status === "novo");
     if (!temNovo) { pararInsistencia(); return; }
     apitar(2);
-    document.title = "🔔 PEDIDO ESPERANDO — Pizzaria Nonna Rosa";
+    document.title = "🔔 PEDIDO ESPERANDO — Pizzaria Vitória";
   }, 20000);
 }
 
 function pararInsistencia() {
   clearInterval(insistir); insistir = null;
-  document.title = "Painel de Pedidos | Pizzaria Nonna Rosa";
+  document.title = "Painel de Pedidos | Pizzaria Vitória";
 }
 
 function avisarNaTela(p) {
-  document.title = "🔔 PEDIDO NOVO — Pizzaria Nonna Rosa";
-  setTimeout(() => { document.title = "Painel de Pedidos | Pizzaria Nonna Rosa"; }, 12000);
+  document.title = "🔔 PEDIDO NOVO — Pizzaria Vitória";
+  setTimeout(() => { document.title = "Painel de Pedidos | Pizzaria Vitória"; }, 12000);
   if ("Notification" in window && Notification.permission === "granted") {
     try {
-      new Notification("Pedido novo — Pizzaria Nonna Rosa", {
+      new Notification("Pedido novo — Pizzaria Vitória", {
         body: `${p.cliente || "Cliente"} · ${p.tipo || ""} · ${reais(p.total || 0)}`,
         tag: p.id
       });
@@ -349,7 +349,7 @@ function cartao(p) {
 
     <div class="acoes">
       <button type="button" class="principal" data-imprimir="${esc(p.id)}">Imprimir</button>
-      ${etapa.proxima ? `<button type="button" data-avancar="${esc(p.id)}">${esc(etapa.acao)}</button>` : ""}
+      ${etapa.proxima ? `<button type="button" data-avancar="${esc(p.id)}">${esc(p.status === "novo" && !imprimirAuto ? "Aceitar pedido" : etapa.acao)}</button>` : ""}
       ${p.status === "novo" ? `<button type="button" class="recusar" data-recusar="${esc(p.id)}">Recusar</button>` : ""}
       ${p.fone ? `<button type="button" class="avisar" data-avisar="${esc(p.id)}">${esc(etapa.avisar || "Avisar cliente")}</button>` : ""}
       ${etapa.reabre ? `<button type="button" class="reabrir" data-reabrir="${esc(p.id)}">Reabrir pedido</button>` : ""}
@@ -777,6 +777,34 @@ document.addEventListener("submit", async e => {
   await gravarCaixa(); desenharCaixa();
 });
 
+/* =========================================================
+   IMPRESSÃO: liga e desliga, escolha do dono
+   Fica guardado no aparelho. Com a impressão desligada, o
+   sistema não abre a tela de impressão sozinho; o botão
+   "Imprimir" de cada pedido continua funcionando na mão.
+   ========================================================= */
+const CHAVE_IMPRESSAO = "vitoria:imprimir";
+let imprimirAuto = true;
+try { imprimirAuto = localStorage.getItem(CHAVE_IMPRESSAO) !== "0"; } catch (e) {}
+
+function pintarBotaoImpressao() {
+  const b = el("[data-impressao]");
+  if (!b) return;
+  b.textContent = imprimirAuto ? "Impressão ligada" : "Impressão desligada";
+  b.setAttribute("aria-pressed", String(imprimirAuto));
+}
+
+const btImpressao = el("[data-impressao]");
+if (btImpressao) {
+  btImpressao.addEventListener("click", () => {
+    imprimirAuto = !imprimirAuto;
+    try { localStorage.setItem(CHAVE_IMPRESSAO, imprimirAuto ? "1" : "0"); } catch (e) {}
+    pintarBotaoImpressao();
+    if (typeof desenhar === "function") desenhar();
+  });
+  pintarBotaoImpressao();
+}
+
 /* ========================= ações ========================= */
 function achar(id) { return pedidos.find(p => p.id === id); }
 
@@ -796,7 +824,12 @@ el("[data-lista]").addEventListener("click", async e => {
     if (!prox) return;
     /* aceitar um pedido novo já manda a comanda para a impressora:
        é o gesto que o balcão faz de qualquer jeito, em um clique só */
-    if (p.status === "novo") { imprimir(p); return; }
+    if (p.status === "novo") {
+      if (imprimirAuto) { imprimir(p); return; }
+      pararInsistencia();
+      await mudarStatus(p.id, "preparando");
+      return;
+    }
     await mudarStatus(p.id, prox);
     return;
   }
@@ -878,7 +911,7 @@ window.rbComandas = {
 /* Sem emojis de propósito: no aparelho do cliente eles chegavam como
    quadradinho, o que passa impressão de mensagem quebrada. Acentos normais. */
 const RECADOS = {
-  novo: p => `Oi ${primeiroNome(p)}! Recebemos seu pedido *#${p.numero}* aqui no Pizzaria Nonna Rosa. Já vamos preparar!`,
+  novo: p => `Oi ${primeiroNome(p)}! Recebemos seu pedido *#${p.numero}* aqui no Pizzaria Vitória. Já vamos preparar!`,
   preparando: p => `Oi ${primeiroNome(p)}! Seu pedido *#${p.numero}* já está sendo preparado. Fica pronto em cerca de 40 minutos.`,
   saiu: p => /entrega/i.test(p.tipo || "")
     ? `Oi ${primeiroNome(p)}! Seu pedido *#${p.numero}* saiu para entrega e chega em instantes. Bom apetite!`

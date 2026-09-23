@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — edição do cardápio pelo dono (aba "Cardápio")
+   Pizzaria Vitória — edição do cardápio pelo dono (aba "Cardápio")
    Criasiteweb
 
    O cardápio de verdade continua em cardapio.js. Aqui ficam só os

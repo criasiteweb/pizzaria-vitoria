@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — MODO LOJA (impressão de comanda)
+   Pizzaria Vitória — MODO LOJA (impressão de comanda)
    Criasiteweb
    ---------------------------------------------------------
    Esta página é só para a lanchonete. O atendente cola aqui

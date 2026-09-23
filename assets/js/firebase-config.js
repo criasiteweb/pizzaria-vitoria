@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — ligação com o servidor de pedidos
+   Pizzaria Vitória — ligação com o servidor de pedidos
    Criasiteweb
 
    ⚠️ MODELO: estas chaves ainda são de exemplo.

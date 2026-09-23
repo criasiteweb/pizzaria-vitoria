@@ -8,10 +8,10 @@
 
 const LOJA = {
   nome: "Pizzaria Vitória",
-  /* MODELO DE DEMONSTRAÇÃO: este é o WhatsApp comercial da Criasiteweb.
+  /* DEMONSTRAÇÃO: WhatsApp comercial da Criasiteweb.
      Na venda, trocar pelo WhatsApp real da pizzaria. */
   whatsapp: "5511994516869",
-  endereco: "Rua Pedro Ripoli, 104 - Barro Branco, Ribeirão Pires - SP",
+  endereco: "Rua Pedro Rípoli, 104 - Barro Branco, Ribeirão Pires - SP, 09407-100",
   preparo: "40 a 60 min",              // [CONFIRMAR com o dono]
   /* Folheto da casa: aberto de segunda a segunda, das 18h às 23h30. */
   abre: 18,
@@ -22,46 +22,55 @@ const LOJA = {
      TABELA DE ENTREGA
        5      -> cobra R$ 5,00
        null   -> aparece "a combinar"
-     ⚠️ VALORES SUGERIDOS pela Criasiteweb. SUBSTITUIR pela
-     tabela real assim que o dono passar.
+     ⚠️ VALORES SUGERIDOS pela Criasiteweb, calculados pela
+     distância real de cada bairro até a loja, na mesma base do
+     Rei Burgão: R$ 3,00 até 2 km e mais R$ 1,00 por km depois
+     disso, com raio de 10 km. SUBSTITUIR pela tabela do dono.
      ======================================================= */
   entrega: {
     ativa: true,
     raioKm: 10,
     cidades: {
       "Ribeirão Pires": {
-        "Barro Branco":          4,
-        "Centro":                5,
-        "Santana":               5,
-        "Jardim Caçula":         6,
-        "Vila Suíça":            6,
-        "Santa Luzia":           6.5,
-        "Jardim Luso":           7,
-        "Pilar Velho":           7,
-        "Ouro Fino Paulista":    8,
-        "Colônia":               8
-      },
-      "Mauá": {
-        "Jardim Zaíra":          9,
-        "Vila Assis Brasil":     9,
-        "Centro":                null
+        "Barro Branco":          3,     // bairro da própria loja
+        "Santana":               3,     // ~0,7 km
+        "Colônia":               3,     // ~1,2 km
+        "Roncon":                3,     // ~1,4 km
+        "Santa Luzia":           3,     // ~1,5 km
+        "Jardim Luso":           3,     // ~1,5 km
+        "Vila Suíssa":           4,     // ~2,6 km
+        "Jardim Itacolomy":      4,     // ~3,1 km
+        "Centro":                4,     // ~3,5 km
+        "Pilar Velho":           5,     // ~3,7 km
+        "Jardim Valentina":      6,     // ~5,1 km
+        "Parque Aliança":        6,     // ~5,2 km
+        "Ouro Fino Paulista":    6,     // ~5,4 km
+        "Quarta Divisão":        9,     // ~8,0 km
+        "Jardim Caçula":        10      // ~9,5 km
       },
       "Rio Grande da Serra": {
-        "Centro":                9
+        "Vila Lopes":            5,     // ~3,7 km
+        "Centro":                7      // ~6,3 km
+      },
+      "Mauá": {
+        "Jardim Primavera":      9,     // ~8,1 km
+        "Jardim Zaíra":         10,     // ~9,3 km
+        "Vila Assis Brasil":    11      // ~9,7 km
       }
     },
 
     /* =====================================================
        TAXA AUTOMÁTICA POR DISTÂNCIA
-       Serve para QUALQUER endereço, mesmo bairro fora da lista.
+       Mesma base do Rei Burgão. Serve para QUALQUER endereço,
+       mesmo bairro fora da lista.
        ===================================================== */
     porDistancia: {
       ativa: true,
-      base: 4,
+      base: 3,        // cobra isto até o "ateKm"
       ateKm: 2,
-      porKm: 1.2,
-      maxKm: 10,
-      fator: 1.3
+      porKm: 1,       // some isto a cada km depois disso
+      maxKm: 10,      // fora deste raio, não entrega
+      fator: 1.3      // linha reta -> rua de verdade
     },
 
     /* quando não dá para descobrir a distância */
@@ -675,7 +684,7 @@ const SEM_LISTA = "__outro__";
    grátis e sem cadastro) e calcula a taxa pelo km rodado.
    Assim qualquer bairro é atendido, não só os da lista.
    ========================================================= */
-const LOJA_COORD = { lat: -23.701686, lon: -46.384320 };   // Rua Pedro Ripoli, Ribeirão Pires
+const LOJA_COORD = { lat: -23.703558, lon: -46.396248 };   // pino do Google Maps da Pizzaria Vitória
 let distanciaKm = null;       // última distância calculada
 let buscaDistancia = null;
 

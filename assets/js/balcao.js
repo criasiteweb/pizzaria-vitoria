@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — Comanda do balcão (aba "Comanda" do painel)
+   Pizzaria Vitória — Comanda do balcão (aba "Comanda" do painel)
    Criasiteweb
 
    Para o pedido que não vem do site: o dono monta clicando

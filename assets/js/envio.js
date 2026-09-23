@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — envio do pedido para o painel da loja
+   Pizzaria Vitória — envio do pedido para o painel da loja
    Criasiteweb
 
    O site continua abrindo o WhatsApp exatamente como antes.

@@ -1,5 +1,5 @@
 /* =========================================================
-   Pizzaria Nonna Rosa — Caixa e relatórios
+   Pizzaria Vitória — Caixa e relatórios
    Criasiteweb
 
    Trabalha em cima dos mesmos pedidos que o painel já recebe.
