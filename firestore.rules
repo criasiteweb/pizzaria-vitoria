@@ -1,7 +1,7 @@
 rules_version = '2';
 
 /* =========================================================
-   Pizzaria Nonna Rosa — regras do servidor de pedidos
+   Pizzaria Vitória — regras do servidor de pedidos
    Criasiteweb
 
    Ideia central:
@@ -16,7 +16,7 @@ service cloud.firestore {
 
     function ehALoja() {
       return request.auth != null
-          && request.auth.token.email == 'loja@nonnarosa.com.br'
+          && request.auth.token.email == 'loja@pizzariavitoria.com.br'
           && request.auth.token.email_verified in [true, false];
     }
 

@@ -98,7 +98,7 @@ const LOJA = {
    deixar aqui o projeto de outro cliente, senão este site
    passa a mostrar o cardápio do cliente errado.
    ========================================================= */
-const PROJETO_SERVIDOR = "TROCAR";
+const PROJETO_SERVIDOR = "pizzaria-vitoria-pedidos";
 const TEM_SERVIDOR = PROJETO_SERVIDOR && PROJETO_SERVIDOR !== "TROCAR";
 const urlServidor = doc =>
   `https://firestore.googleapis.com/v1/projects/${PROJETO_SERVIDOR}/databases/(default)/documents/publico/${doc}`;
