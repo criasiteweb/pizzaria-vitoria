@@ -16,7 +16,7 @@ service cloud.firestore {
 
     function ehALoja() {
       return request.auth != null
-          && request.auth.token.email == 'loja@pizzariavitoria.com.br'
+          && request.auth.token.email == 'criasite.site@gmail.com'
           && request.auth.token.email_verified in [true, false];
     }
 

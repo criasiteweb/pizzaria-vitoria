@@ -19,4 +19,4 @@ export const FIREBASE_CONFIG = {
 };
 
 /* conta usada pelo balcão para entrar no painel */
-export const CONTA_LOJA = "loja@pizzariavitoria.com.br";
+export const CONTA_LOJA = "criasite.site@gmail.com";
