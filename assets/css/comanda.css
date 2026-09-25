@@ -251,6 +251,15 @@ details.guia strong{color:var(--texto)}
 .cmd-item:hover{ border-color: var(--amarelo); }
 .cmd-item:active{ transform: scale(.99); }
 .cmd-item b{ color: var(--amarelo); white-space: nowrap; }
+.cmd-item.escolhido{ border-color: var(--amarelo); background: rgba(212,42,32,.14); }
+
+.cmd-mm{
+  display: block; width: 100%; margin: 8px 0 0; padding: 8px 10px; border-radius: 9px;
+  cursor: pointer; font-size: .78rem; font-weight: 700; text-align: center;
+  background: #1C1C21; color: #EDEAE2; border: 1px solid rgba(237,234,226,.14);
+}
+.cmd-mm[aria-pressed="true"]{ background: var(--amarelo); color: #fff; border-color: var(--amarelo); }
+.cmd-mm-ajuda{ margin: 6px 0 0; font-size: .72rem; color: var(--texto-suave); text-align: center; }
 .cmd-avulso{
   width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; cursor: pointer;
   background: transparent; color: #EDEAE2; border: 1px dashed rgba(237,234,226,.3); font-size: .85rem;
