@@ -17,24 +17,23 @@
   document.write('<link rel="stylesheet" href="assets/css/estilo.css?t=' + t + '">'); })();
 </script>
 <noscript><link rel="stylesheet" href="assets/css/estilo.css" /></noscript>
-<style>
-  /* Esta página não tem a foto de capa grande do site principal, que é o
-     que "absorve" o cabeçalho fixo lá. Aqui o cabeçalho ficaria por cima
-     do título, então reserva o espaço dele no topo do conteúdo. */
-  main{padding-top:74px}
-</style>
 </head>
 <body>
 <div class="barra-progresso" aria-hidden="true"><i></i></div>
 
-<header class="topo" data-topo data-fixo="true">
+<header class="topo" data-topo>
   <a class="marca" href="#inicio" aria-label="Pizzaria Vitória — início">
     <img src="assets/img/logo.jpg" alt="" width="44" height="44" />
     <span>
       <strong>Vitória</strong>
-      <small data-mesa-titulo>Mesa</small>
+      <small data-mesa-titulo>Pizzaria · Ribeirão Pires</small>
     </span>
   </a>
+  <nav class="atalhos" aria-label="Seções">
+    <a href="#cardapio">Cardápio</a>
+    <a href="#combos">Promoções</a>
+    <a href="#onde">Onde estamos</a>
+  </nav>
   <button class="btn-carrinho" type="button" data-abrir-carrinho aria-label="Abrir carrinho">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.6 9H8.2L6 3H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/></svg>
     <span data-contador>0</span>
@@ -43,20 +42,38 @@
 
 <main id="inicio">
 
+  <section class="capa">
+    <div class="capa-foto" aria-hidden="true">
+      <img src="assets/img/fotos/capa.jpg" alt="" fetchpriority="high" width="1400" height="788" />
+      <span class="capa-veu"></span>
+      <span class="brilho brilho-a"></span>
+      <span class="brilho brilho-b"></span>
+    </div>
+    <div class="capa-conteudo">
+      <img class="capa-logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" width="130" height="130" />
+      <p class="chamada">Pizzaria em Ribeirão Pires · Desde sempre em família</p>
+      <h1 data-mesa-h1>O novo sabor<br />de <em>Ribeirão</em>.</h1>
+      <p class="sub">68 sabores salgados e 31 doces, mais lanches, pastéis e porções. <b>Todas as pizzas com borda de catupiry grátis</b> e meio a meio pelo valor da mais cara. Monte o pedido aqui, direto da sua mesa.</p>
+
+      <div class="selos">
+        <span class="selo nota"><b>5,0</b> <i aria-hidden="true">★★★★★</i> <small>no Google</small></span>
+        <span class="selo" data-status-selo><i class="ponto" aria-hidden="true"></i> <b data-status-texto>Verificando…</b></span>
+        <span class="selo"><b>Borda de catupiry</b> <small>grátis</small></span>
+      </div>
+
+      <div class="capa-botoes">
+        <a class="botao primario grande" href="#cardapio">Montar meu pedido</a>
+      </div>
+      <a class="insta" href="https://www.instagram.com/" target="_blank" rel="noopener">@pizzariavitoria no Instagram</a>
+    </div>
+    <div class="rolar" aria-hidden="true"><span></span></div>
+  </section>
+
   <section class="faixa" aria-label="Informações rápidas">
     <div><b data-mesa-numero>Mesa</b><small>peça quantas vezes quiser</small></div>
     <div><b>Sem pagamento agora</b><small>a conta fecha no final, com o garçom</small></div>
-  </section>
-
-  <section id="cardapio" class="secao">
-    <div class="titulo-secao" data-surge>
-      <p class="chamada">Cardápio da mesa</p>
-      <h2>Faça seu pedido</h2>
-      <p class="apoio">Toque na pizza para fazer meio a meio, escolher a massa e a borda. Cada pedido enviado já vai direto para a cozinha. <span class="ilustrativa">Imagens ilustrativas.</span></p>
-    </div>
-
-    <div class="filtros" role="tablist" aria-label="Filtrar cardápio" data-filtros></div>
-    <div class="cardapio" data-cardapio></div>
+    <div><b>99 sabores</b><small>68 salgados e 31 doces</small></div>
+    <div><b>Meio a meio</b><small>vale o valor da mais cara</small></div>
   </section>
 
   <section id="combos" class="secao promo" data-surge>
@@ -72,6 +89,42 @@
     <p class="promo-rodape">Promoção por tempo indeterminado, conforme o folheto da casa.</p>
   </section>
 
+  <section id="cardapio" class="secao">
+    <div class="titulo-secao" data-surge>
+      <p class="chamada">Nosso cardápio</p>
+      <h2>Cardápio completo</h2>
+      <p class="apoio">Toque na pizza para fazer meio a meio, escolher a massa e a borda. Cada pedido enviado já vai direto para a cozinha. <span class="ilustrativa">Imagens ilustrativas.</span></p>
+    </div>
+
+    <div class="filtros" role="tablist" aria-label="Filtrar cardápio" data-filtros></div>
+    <div class="cardapio" data-cardapio></div>
+  </section>
+
+  <section class="secao avaliacoes" aria-labelledby="t-aval">
+    <div class="titulo-secao" data-surge>
+      <p class="chamada">Quem já pediu</p>
+      <h2 id="t-aval">Nota 5,0 no Google</h2>
+      <p class="apoio">Avaliações publicadas por clientes na ficha do Google da pizzaria.</p>
+    </div>
+    <div class="cartoes-aval">
+      <article data-surge>
+        <i aria-hidden="true">★★★★★</i>
+        <p>“Pizza muito bem recheada e chegou quentinha. Virou a pizzaria da família.”</p>
+        <footer><b>Nelson Borges</b><small>Google · há 3 meses</small></footer>
+      </article>
+      <article data-surge>
+        <i aria-hidden="true">★★★★★</i>
+        <p>“Meio a meio de calabresa com carne seca, e a borda de catupiry vem de graça. Show.”</p>
+        <footer><b>Thiago Costa</b><small>Google · há 1 ano</small></footer>
+      </article>
+      <article data-surge>
+        <i aria-hidden="true">★★★★★</i>
+        <p>“Atendimento de família mesmo, e o pastel é excelente. Recomendo 👍”</p>
+        <footer><b>Rita Santos</b><small>Google · Local Guide</small></footer>
+      </article>
+    </div>
+  </section>
+
   <section class="secao fidelidade" aria-labelledby="t-fid" data-surge hidden>
     <div class="fid-caixa">
       <p class="chamada">Programa de fidelidade</p>
@@ -81,11 +134,54 @@
       <p class="fid-regra"></p>
     </div>
   </section>
+
+  <section id="onde" class="secao onde">
+    <div class="onde-texto" data-surge>
+      <p class="chamada">Onde estamos</p>
+      <h2>Barro Branco, Ribeirão Pires</h2>
+      <p class="endereco">Rua Pedro Rípoli, 104<br />Barro Branco · Ribeirão Pires — SP<br />CEP 09407-100 · a 20 m da Av. Francisco Monteiro</p>
+      <ul class="dados">
+        <li><b>WhatsApp</b><span>(11) 99451-6869</span></li>
+        <li><b>Horário</b><span>17h30 às 23h40 <em>de segunda a segunda</em></span></li>
+        <li><b>Entrega</b><span>Até 10 km · Ribeirão Pires, Rio Grande da Serra e Mauá</span></li>
+      </ul>
+      <div class="onde-botoes">
+        <a class="botao primario" href="https://wa.me/5511994516869?text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20Pizzaria%20Vit%C3%B3ria%20e%20quero%20fazer%20um%20pedido." target="_blank" rel="noopener">Chamar no WhatsApp</a>
+        <div class="ir-ate">
+          <span class="ir-ate-rot">Como chegar</span>
+          <div class="ir-ate-botoes">
+            <a class="botao contorno rota" href="https://www.google.com/maps/dir/?api=1&destination=Rua%20Pedro%20R%C3%ADpoli%2C%20104%20-%20Barro%20Branco%2C%20Ribeir%C3%A3o%20Pires%20-%20SP%2C%2009407-100" target="_blank" rel="noopener">
+              <span aria-hidden="true">🗺️</span> Google Maps
+            </a>
+            <a class="botao contorno rota" href="https://www.waze.com/ul?q=Rua%20Pedro%20R%C3%ADpoli%2C%20104%20-%20Barro%20Branco%2C%20Ribeir%C3%A3o%20Pires%20-%20SP%2C%2009407-100&navigate=yes" target="_blank" rel="noopener">
+              <span aria-hidden="true">🚗</span> Waze
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="onde-mapa" data-surge>
+      <iframe title="Mapa da Pizzaria Vitória" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps?q=Rua%20Pedro%20R%C3%ADpoli%2C%20104%20-%20Barro%20Branco%2C%20Ribeir%C3%A3o%20Pires%20-%20SP%2C%2009407-100&output=embed"></iframe>
+    </div>
+  </section>
+
+  <section class="secao chamada-final" data-surge>
+    <img src="assets/img/logo.jpg" alt="" width="84" height="84" />
+    <h2>Deu vontade de pizza?</h2>
+    <p>Monte o pedido no cardápio, direto da sua mesa.</p>
+    <button class="botao primario grande" type="button" data-abrir-carrinho>Fazer meu pedido</button>
+  </section>
 </main>
 
 <footer class="rodape">
   <img src="assets/img/logo.jpg" alt="Pizzaria Vitória" width="60" height="60" />
-  <p class="slogan">Pedido direto da sua mesa</p>
+  <p class="slogan">O novo sabor de Ribeirão</p>
+  <p class="end">Rua Pedro Rípoli, 104 · Barro Branco · Ribeirão Pires — SP</p>
+  <div class="rodape-links">
+    <a href="https://wa.me/5511994516869" target="_blank" rel="noopener">WhatsApp (11) 99451-6869</a>
+    <a href="https://www.instagram.com/" target="_blank" rel="noopener">@pizzariavitoria</a>
+  </div>
   <small>Criado por <a href="https://criasite.site/cria-site-vitrine" target="_blank" rel="noopener">Cria Site</a></small>
 </footer>
 
@@ -102,8 +198,8 @@
 <aside class="carrinho" data-carrinho aria-label="Seu pedido" aria-hidden="true">
   <div class="carrinho-topo">
     <div>
-      <p class="chamada" data-mesa-titulo-carrinho>Mesa</p>
-      <h2>Seu pedido</h2>
+      <p class="chamada" data-mesa-titulo-carrinho>Seu pedido</p>
+      <h2>Carrinho</h2>
     </div>
     <button class="fechar" type="button" data-fechar-carrinho aria-label="Fechar carrinho">×</button>
   </div>
@@ -111,6 +207,13 @@
     <div class="carrinho-corpo">
       <div class="carrinho-itens" data-itens></div>
       <div class="checkout-campos">
+        <div class="login-google" data-login-google>
+          <button type="button" class="botao contorno" data-entrar-google>Entrar com Google (opcional)</button>
+        </div>
+        <div class="login-google conta" data-conta-google hidden>
+          <span>Olá, <b data-conta-nome></b>.</span>
+          <button type="button" data-sair-google>Sair</button>
+        </div>
         <label>Seu nome <small>(opcional)</small>
           <input name="nome" type="text" placeholder="Como te chamamos?" autocomplete="name" />
         </label>
@@ -233,6 +336,7 @@
   document.write('<script src="assets/js/app.js?t=' + t + '"><\/script>'); })();
 </script>
 <script type="module" src="assets/js/mesa.js?v=1"></script>
+<script type="module" src="assets/js/cliente-login.js?v=1"></script>
 <script>
 (function(){
   var m = new URLSearchParams(location.search).get("mesa");
@@ -242,7 +346,7 @@
   }
   document.querySelectorAll("[data-mesa-titulo]").forEach(function(e){ e.textContent = "Mesa " + m; });
   document.querySelectorAll("[data-mesa-numero]").forEach(function(e){ e.textContent = "Mesa " + m; });
-  document.querySelectorAll("[data-mesa-titulo-carrinho]").forEach(function(e){ e.textContent = "Mesa " + m; });
+  document.querySelectorAll("[data-mesa-titulo-carrinho]").forEach(function(e){ e.textContent = "Mesa " + m + " · Seu pedido"; });
 })();
 </script>
 </body>
