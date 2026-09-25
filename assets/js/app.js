@@ -14,63 +14,121 @@ const LOJA = {
   endereco: "Rua Pedro Rípoli, 104 - Barro Branco, Ribeirão Pires - SP, 09407-100",
   preparo: "40 a 60 min",              // [CONFIRMAR com o dono]
   /* Folheto da casa: aberto de segunda a segunda, das 18h às 23h30. */
-  abre: 18,
-  fecha: 23.5,
+  abre: 17.5,
+  fecha: 23.6667, // 23h40
   diasFechados: [],                    // não fecha nenhum dia
 
   /* =======================================================
      TABELA DE ENTREGA
        5      -> cobra R$ 5,00
        null   -> aparece "a combinar"
-     ⚠️ VALORES SUGERIDOS pela Criasiteweb, calculados pela
-     distância real de cada bairro até a loja, na mesma base do
-     Rei Burgão: R$ 3,00 até 2 km e mais R$ 1,00 por km depois
-     disso, com raio de 10 km. SUBSTITUIR pela tabela do dono.
+     Tabela real do dono, passada pelo Matheus em 25/09/2026.
      ======================================================= */
   entrega: {
     ativa: true,
     raioKm: 10,
+    /* Tabela real de bairros e taxa, passada pelo Matheus em 25/09/2026,
+       82 bairros no total. */
     cidades: {
       "Ribeirão Pires": {
-        "Barro Branco":          3,     // bairro da própria loja
-        "Santana":               3,     // ~0,7 km
-        "Colônia":               3,     // ~1,2 km
-        "Roncon":                3,     // ~1,4 km
-        "Santa Luzia":           3,     // ~1,5 km
-        "Jardim Luso":           3,     // ~1,5 km
-        "Vila Suíssa":           4,     // ~2,6 km
-        "Jardim Itacolomy":      4,     // ~3,1 km
-        "Centro":                4,     // ~3,5 km
-        "Pilar Velho":           5,     // ~3,7 km
-        "Jardim Valentina":      6,     // ~5,1 km
-        "Parque Aliança":        6,     // ~5,2 km
-        "Ouro Fino Paulista":    6,     // ~5,4 km
-        "Quarta Divisão":        9,     // ~8,0 km
-        "Jardim Caçula":        10      // ~9,5 km
-      },
-      "Rio Grande da Serra": {
-        "Vila Lopes":            5,     // ~3,7 km
-        "Centro":                7      // ~6,3 km
-      },
-      "Mauá": {
-        "Jardim Primavera":      9,     // ~8,1 km
-        "Jardim Zaíra":         10,     // ~9,3 km
-        "Vila Assis Brasil":    11      // ~9,7 km
+        "Alvorada": 6.00,
+        "Ana Rosa (Mercado Fã)": 17.00,
+        "Angelino, F. Gianazzi": 5.00,
+        "Barro Branco": 6.00,
+        "Bertoldo": 6.00,
+        "Bosque Santana": 6.00,
+        "Centro Alto": 8.00,
+        "Centro Baixo": 6.00,
+        "Chácara dos Sonhos": 17.00,
+        "Clube de Campo": 19.00,
+        "Colônia": 6.00,
+        "Estância Noblesse": 8.00,
+        "Fazenda Matarazzo": 8.00,
+        "Iramaia": 8.00,
+        "Jardim Aprazível": 17.00,
+        "Jardim Bandeirantes": 8.00,
+        "Jardim dos Eucaliptos": 8.00,
+        "Jardim dos Lagos": 17.00,
+        "Jardim Caçula": 15.00,
+        "Jardim Esperança": 15.00,
+        "Jardim Guanabara": 12.00,
+        "Jardim Itacolomi": 8.00,
+        "Jardim Luzo": 6.00,
+        "Jardim Mirante": 8.00,
+        "Jardim Santa Inês": 9.00,
+        "Jardim Serrano": 17.00,
+        "Jardim São Francisco": 6.00,
+        "Jardim União": 8.00,
+        "Jardim Valentina": 9.00,
+        "Júlio Prestes de Albuquerque S MJ": 9.00,
+        "KM 4": 17.00,
+        "Lusitano / Luzitano": 8.00,
+        "Nossa Senhora de Fátima": 6.00,
+        "Ouro Fino (Antes da linha)": 8.00,
+        "Ouro Fino (Depois da linha)": 12.00,
+        "Ouro Fino (Depois da passarela)": 15.00,
+        "Palmeiras": 17.00,
+        "Parque Aliança": 12.00,
+        "Parque Andréense": 20.00,
+        "Parque das Fontes": 6.00,
+        "Parque do Governador": 9.00,
+        "Pereira Barreto": 7.00,
+        "Petrópolis": 6.00,
+        "Pilar Velho": 8.00,
+        "Planalto Bela Vista": 8.00,
+        "Ponte Seca": 8.00,
+        "Pouso Alegre": 8.00,
+        "Próxima Padaria Neves": 17.00,
+        "Quarta Divisão": 10.00,
+        "Rancho Alegre": 8.00,
+        "Recanto Suíço": 8.00,
+        "Represa": 15.00,
+        "Roncon": 6.00,
+        "Rua 2, 3 e 4 Sítio Maria Joana": 8.00,
+        "Rua Chile SMJ": 10.00,
+        "Rua dos Canais (Canários)": 20.00,
+        "Rua Jangadeiro": 25.00,
+        "Santa Clara": 8.00,
+        "Santa Luzia": 6.00,
+        "Santa Rosa": 6.00,
+        "Santana": 6.00,
+        "Sol Nascente": 17.00,
+        "Soma": 10.00,
+        "São Caetaninho": 12.00,
+        "São Pedro (Palmeiras)": 17.00,
+        "Sítio dos Vianas": 12.00,
+        "Sítio Pinheiros": 17.00,
+        "Tavolaro": 8.00,
+        "Vila Lopes": 12.00,
+        "Vila São João": 12.00,
+        "Vila Aparecida": 6.00,
+        "Vila Conceição": 6.00,
+        "Vila Mara": 6.00,
+        "Vila Caiçara": 6.00,
+        "Vila Suíça": 8.00,
+        "Vila Aurora": 8.00,
+        "Vila Marquesa": 9.00,
+        "Vila Sueli": 9.00,
+        "Vila Bocaina": 9.00,
+        "Vila Gomes": 12.00,
+        "Vila Verde": 10.00,
+        "Vila Belmiro": 12.00
       }
     },
 
     /* =====================================================
        TAXA AUTOMÁTICA POR DISTÂNCIA
-       Mesma base do Rei Burgão. Serve para QUALQUER endereço,
-       mesmo bairro fora da lista.
+       Desligada: a tabela real de 82 bairros já cobre a área
+       de entrega da loja. Bairro fora da lista cai no aviso
+       "Não encontrou seu bairro? Fale conosco pelo WhatsApp".
        ===================================================== */
     porDistancia: {
-      ativa: true,
-      base: 3,        // cobra isto até o "ateKm"
+      ativa: false,
+      base: 3,
       ateKm: 2,
-      porKm: 1,       // some isto a cada km depois disso
-      maxKm: 10,      // fora deste raio, não entrega
-      fator: 1.3      // linha reta -> rua de verdade
+      porKm: 1,
+      maxKm: 10,
+      fator: 1.3
     },
 
     /* quando não dá para descobrir a distância */
@@ -142,7 +200,7 @@ const saboresDoGrupo = g => CARDAPIO.filter(i => i.g === g && i.pz && !i.off);
 function tamEscolhido() {
   if (itemAtual && ehCombo(itemAtual)) return itemAtual.pzcombo;
   const r = $("[data-tam]:checked");
-  return r ? r.value : (TAMANHOS[2] || TAMANHOS[0]).id;
+  return r ? r.value : (TAMANHOS[TAMANHOS.length - 1] || TAMANHOS[0]).id;
 }
 function bordaEscolhida() {
   const sel = $("[data-borda]");
@@ -226,7 +284,7 @@ function montarCardapio() {
 
 /* ================= blocos da montagem da pizza ================= */
 function blocoTamanhos(it) {
-  const padrao = (TAMANHOS[2] || TAMANHOS[0]).id;
+  const padrao = (TAMANHOS[TAMANHOS.length - 1] || TAMANHOS[0]).id;
   return `<div class="extras-bloco">
     <p class="extras-titulo">Escolha o tamanho</p>
     <div class="tamanhos">
@@ -385,12 +443,16 @@ function precoModal() {
   if (ehPizza(itemAtual)) {
     const tam = tamEscolhido();
     base = precoSabor(itemAtual, tam);
-    /* meio a meio: vale o sabor mais caro */
+    /* meio a meio: vale o sabor mais caro. No broto, meio a meio
+       soma R$ 1,00 a mais (regra da casa). */
+    let temSegundoSabor = false;
     $$("[data-sabor]").forEach(sel => {
       if (!sel.value) return;
+      temSegundoSabor = true;
       const outro = CARDAPIO.find(i => i.id === sel.value);
       if (outro) base = Math.max(base, precoSabor(outro, tam));
     });
+    if (tam === "broto" && temSegundoSabor) base += TAXA_MEIO_A_MEIO_BROTO;
   } else {
     base = Number(itemAtual.p || 0);
   }
@@ -1267,11 +1329,12 @@ async function lerEstadoLoja() {
     const ag = new Date();
     const hojeTxt = ag.getFullYear() + "-" + String(ag.getMonth() + 1).padStart(2, "0") +
       "-" + String(ag.getDate()).padStart(2, "0");
-    /* O botão do painel só FECHA antes da hora, e vale só no dia em que foi
-       usado. Nunca força a loja a ficar aberta fora do horário: senão um
-       esquecimento deixaria o site aceitando pedido de madrugada. */
-    lojaNoManual = (dia === hojeTxt && v && v.booleanValue === false) ? false : null;
-    guardarNoAparelho("loja", { fechada: lojaNoManual === false, dia: hojeTxt });
+    /* O botão do painel vale para abrir OU fechar fora do horário, mas só
+       no dia em que foi usado: no dia seguinte o site volta sozinho a
+       seguir o horário normal, para ninguém esquecer a loja aberta de
+       madrugada nem fechada na hora do movimento. */
+    lojaNoManual = (dia === hojeTxt && v) ? v.booleanValue !== false : null;
+    guardarNoAparelho("loja", { manual: lojaNoManual, dia: hojeTxt });
     travarEnvio();
   } catch (e) {
     /* servidor fora do ar: vale a última resposta boa de hoje, e na falta
@@ -1280,7 +1343,7 @@ async function lerEstadoLoja() {
     const hojeTxt = ag.getFullYear() + "-" + String(ag.getMonth() + 1).padStart(2, "0") +
       "-" + String(ag.getDate()).padStart(2, "0");
     const guardado = lerDoAparelho("loja", 12 * 60 * 60 * 1000);
-    lojaNoManual = (guardado && guardado.dia === hojeTxt && guardado.fechada) ? false : null;
+    lojaNoManual = (guardado && guardado.dia === hojeTxt) ? guardado.manual : null;
     travarEnvio();
   }
   statusLoja();
