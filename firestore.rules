@@ -95,6 +95,17 @@ service cloud.firestore {
       allow delete: if ehALoja();
     }
 
+    /* Login opcional do cliente com a conta Google, no site e no
+       /restaurante. Cada cliente só lê/escreve o próprio cadastro (nome,
+       telefone, endereço) e o próprio histórico de pedidos — nunca vê o
+       de outro cliente, e a loja não precisa dessa coleção pra nada. */
+    match /clientes/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      match /pedidos/{pedidoId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+
     /* Segunda senha do "Acesso privado" (Caixa, Histórico e Cardápio).
        Só quem já está logado como a loja no painel consegue ler ou trocar,
        nunca o site do cliente. */
