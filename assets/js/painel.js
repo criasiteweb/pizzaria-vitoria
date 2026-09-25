@@ -824,32 +824,11 @@ document.addEventListener("submit", async e => {
 });
 
 /* =========================================================
-   IMPRESSÃO: liga e desliga, escolha do dono
-   Fica guardado no aparelho. Com a impressão desligada, o
-   sistema não abre a tela de impressão sozinho; o botão
-   "Imprimir" de cada pedido continua funcionando na mão.
+   IMPRESSÃO automática ao aceitar pedido do site.
+   Sempre ligada, sem botão pra desligar (pedido do Matheus em
+   25/09/2026: "tira ele, não é necessário").
    ========================================================= */
-const CHAVE_IMPRESSAO = "vitoria:imprimir";
-let imprimirAuto = true;
-try { imprimirAuto = localStorage.getItem(CHAVE_IMPRESSAO) !== "0"; } catch (e) {}
-
-function pintarBotaoImpressao() {
-  const b = el("[data-impressao]");
-  if (!b) return;
-  b.textContent = imprimirAuto ? "Impressão ligada" : "Impressão desligada";
-  b.setAttribute("aria-pressed", String(imprimirAuto));
-}
-
-const btImpressao = el("[data-impressao]");
-if (btImpressao) {
-  btImpressao.addEventListener("click", () => {
-    imprimirAuto = !imprimirAuto;
-    try { localStorage.setItem(CHAVE_IMPRESSAO, imprimirAuto ? "1" : "0"); } catch (e) {}
-    pintarBotaoImpressao();
-    if (typeof desenhar === "function") desenhar();
-  });
-  pintarBotaoImpressao();
-}
+const imprimirAuto = true;
 
 /* ========================= ações ========================= */
 function achar(id) { return pedidos.find(p => p.id === id); }
