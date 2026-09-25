@@ -209,8 +209,14 @@ const saboresDoGrupo = g => CARDAPIO.filter(i => i.g === g && i.pz && !i.off);
    assim (pedido do Matheus, 25/09/2026) */
 const todosSaboresPizza = () => CARDAPIO.filter(i => i.pz && !i.off);
 
+/* quando o item foi aberto a partir de uma das 4 categorias de pizza
+   (Grande/Broto Inteira/Meio a Meio), o tamanho já vem decidido lá de
+   trás, sem precisar escolher de novo dentro do modal */
+let modoPizzaPreset = null;
+
 function tamEscolhido() {
   if (itemAtual && ehCombo(itemAtual)) return itemAtual.pzcombo;
+  if (modoPizzaPreset) return modoPizzaPreset.tam;
   const r = $("[data-tam]:checked");
   return r ? r.value : (TAMANHOS[TAMANHOS.length - 1] || TAMANHOS[0]).id;
 }
@@ -240,18 +246,72 @@ try {
   }
 } catch (e) { carrinho = []; }
 
-/* ========================= cardápio ========================= */
+/* ========================= cardápio =========================
+   Pizza vem primeiro pelo TAMANHO e pelo TIPO DE MONTAGEM (Grande
+   Inteira, Grande Meio a Meio, Broto Inteira, Broto Meio a Meio),
+   escolhidos antes do sabor — assim o cliente já sabe o que está
+   escolhendo, em vez de decidir o tamanho só depois de abrir o
+   sabor. Dentro de cada um, os sabores vêm separados por Salgadas
+   e Doces, com foto e preço já daquele tamanho.
+   Pedido do Matheus em 25/09/2026, pra não ficar bagunçado com
+   quase 100 sabores todos misturados. */
+const MODOS_PIZZA = [
+  { id: "grande-inteira", tam: "grande", mm: false, titulo: "Pizza Grande Inteira",      rotulo: "Grande Inteira" },
+  { id: "grande-mm",      tam: "grande", mm: true,  titulo: "Pizza Grande Meio a Meio",  rotulo: "Grande Meio a Meio" },
+  { id: "broto-inteira",  tam: "broto",  mm: false, titulo: "Pizza Broto Inteira",       rotulo: "Broto Inteira" },
+  { id: "broto-mm",       tam: "broto",  mm: true,  titulo: "Pizza Broto Meio a Meio",   rotulo: "Broto Meio a Meio" }
+];
+const GRUPOS_FORA_DA_PIZZA = () => GRUPOS.filter(g => !["promocoes", "salgadas", "doces"].includes(g.id));
+
+function cartaoItem(i, tam, modoId) {
+  const preco = ehPizza(i) ? precoSabor(i, tam) : Number(i.p || 0);
+  return `
+    <button class="item" type="button" data-item="${i.id}" ${modoId ? `data-modo="${modoId}"` : ""}>
+      <span class="item-foto">
+        <img src="${i.foto || `assets/img/fotos/${i.f}.jpg`}" alt="${i.n}" loading="lazy" decoding="async" width="560" height="420" />
+        ${i.tag ? `<span class="etiqueta">${i.tag}</span>` : ""}
+      </span>
+      <span class="item-corpo">
+        <span class="item-nome">${i.n}</span>
+        ${i.d ? `<span class="item-desc">${i.d}</span>` : ""}
+        <span class="item-rodape">
+          <span class="item-preco">${reais(preco)}</span>
+          <span class="item-mais" aria-hidden="true">+</span>
+        </span>
+      </span>
+    </button>`;
+}
+
 function montarCardapio() {
   const alvo = $("[data-cardapio]");
   const filtros = $("[data-filtros]");
+  const grupos = GRUPOS_FORA_DA_PIZZA();
 
   filtros.innerHTML =
     `<button type="button" role="tab" aria-selected="true" data-f="todos">Tudo</button>` +
-    GRUPOS.filter(g => g.id !== "promocoes")
-      .map(g => `<button type="button" role="tab" aria-selected="false" data-f="${g.id}">${g.rotulo}</button>`).join("");
+    MODOS_PIZZA.map(m => `<button type="button" role="tab" aria-selected="false" data-f="${m.id}">${m.rotulo}</button>`).join("") +
+    grupos.map(g => `<button type="button" role="tab" aria-selected="false" data-f="${g.id}">${g.rotulo}</button>`).join("");
 
-  alvo.innerHTML = GRUPOS.filter(g => g.id !== "promocoes").map(g => {
-    /* o dono marca "acabou" no painel e o item some da lista do cliente */
+  const gruposPizza = MODOS_PIZZA.map(m => {
+    const salgadas = CARDAPIO.filter(i => i.g === "salgadas" && i.pz && !i.off);
+    const doces = CARDAPIO.filter(i => i.g === "doces" && i.pz && !i.off);
+    return `
+      <div class="grupo" data-grupo="${m.id}">
+        <div class="grupo-topo">
+          <h3>${m.titulo}</h3>
+          <span>${salgadas.length + doces.length} opções</span>
+        </div>
+        <p class="grupo-nota">${m.mm
+          ? "Meio a meio à vontade, inclusive misturando salgada com doce. Paga-se o valor do sabor mais caro" + (m.tam === "broto" ? " + R$ 1,00." : ".")
+          : "Um sabor só, do jeitinho que está no cardápio."}</p>
+        <h4 class="subgrupo-titulo">Salgadas</h4>
+        <div class="lista-itens">${salgadas.map(i => cartaoItem(i, m.tam, m.id)).join("")}</div>
+        <h4 class="subgrupo-titulo">Doces</h4>
+        <div class="lista-itens">${doces.map(i => cartaoItem(i, m.tam, m.id)).join("")}</div>
+      </div>`;
+  }).join("");
+
+  const gruposResto = grupos.map(g => {
     const itens = CARDAPIO.filter(i => i.g === g.id && !i.off);
     return `
       <div class="grupo" data-grupo="${g.id}">
@@ -260,25 +320,11 @@ function montarCardapio() {
           <span>${itens.length} ${itens.length === 1 ? "opção" : "opções"}</span>
         </div>
         ${g.nota ? `<p class="grupo-nota">${g.nota}</p>` : ""}
-        <div class="lista-itens">
-          ${itens.map(i => `
-            <button class="item" type="button" data-item="${i.id}">
-              <span class="item-foto">
-                <img src="${i.foto || `assets/img/fotos/${i.f}.jpg`}" alt="${i.n}" loading="lazy" decoding="async" width="560" height="420" />
-                ${i.tag ? `<span class="etiqueta">${i.tag}</span>` : ""}
-              </span>
-              <span class="item-corpo">
-                <span class="item-nome">${i.n}</span>
-                ${i.d ? `<span class="item-desc">${i.d}</span>` : ""}
-                <span class="item-rodape">
-                  <span class="item-preco">${i.pz && TAMANHOS.length > 1 ? `<small>a partir de</small> ${reais(precoDe(i))}` : reais(i.p)}</span>
-                  <span class="item-mais" aria-hidden="true">+</span>
-                </span>
-              </span>
-            </button>`).join("")}
-        </div>
+        <div class="lista-itens">${itens.map(i => cartaoItem(i, null, null)).join("")}</div>
       </div>`;
   }).join("");
+
+  alvo.innerHTML = gruposPizza + gruposResto;
 
   filtros.addEventListener("click", e => {
     const b = e.target.closest("button[data-f]");
@@ -290,7 +336,9 @@ function montarCardapio() {
 
   alvo.addEventListener("click", e => {
     const b = e.target.closest("[data-item]");
-    if (b) abrirModal(b.dataset.item);
+    if (!b) return;
+    const modo = b.dataset.modo ? MODOS_PIZZA.find(m => m.id === b.dataset.modo) : null;
+    abrirModal(b.dataset.item, modo ? { tam: modo.tam, mm: modo.mm } : null);
   });
 }
 
@@ -317,10 +365,11 @@ function blocoTamanhos(it) {
 
 function blocoSabores(it) {
   const t = TAM(tamEscolhido());
-  if (t.sabores < 2) {
+  const soUmSabor = t.sabores < 2 || (modoPizzaPreset && !modoPizzaPreset.mm);
+  if (soUmSabor) {
     return `<div class="extras-bloco">
       <p class="extras-titulo">Sabor</p>
-      <p class="extras-ajuda">No tamanho ${t.n} vai 1 sabor só: <b>${it.n}</b>.</p>
+      <p class="extras-ajuda">Pizza ${t.n} inteira, 1 sabor só: <b>${it.n}</b>.</p>
     </div>`;
   }
   const lista = todosSaboresPizza().filter(s => s.id !== it.id);
@@ -387,15 +436,18 @@ function blocoBorda() {
 /* ========================= modal do item ========================= */
 let itemAtual = null, qtdAtual = 1;
 
-function abrirModal(id) {
+function abrirModal(id, modo) {
   const it = CARDAPIO.find(i => i.id === id);
   if (!it) return;
   itemAtual = it; qtdAtual = 1;
+  modoPizzaPreset = modo || null;
 
   const mf = $("[data-modal-foto]");
   mf.src = it.foto || `assets/img/fotos/${it.f}.jpg`;
   mf.alt = it.n;
-  $("[data-modal-cat]").textContent = GRUPOS.find(g => g.id === it.g).titulo;
+  $("[data-modal-cat]").textContent = modoPizzaPreset
+    ? MODOS_PIZZA.find(m => m.tam === modoPizzaPreset.tam && m.mm === modoPizzaPreset.mm).titulo
+    : GRUPOS.find(g => g.id === it.g).titulo;
   $("[data-modal-nome]").textContent = it.n;
   const desc = $("[data-modal-desc]");
   desc.textContent = it.d || "";
@@ -407,8 +459,10 @@ function abrirModal(id) {
   let html = "";
 
   if (ehPizza(it)) {
-    /* pizzaria de tamanho único não precisa de escolha de tamanho */
-    if (TAMANHOS.length > 1) html += blocoTamanhos(it);
+    /* pizzaria de tamanho único não precisa de escolha de tamanho, e
+       quando veio de uma das 4 categorias o tamanho já foi escolhido
+       antes de abrir o sabor */
+    if (TAMANHOS.length > 1 && !modoPizzaPreset) html += blocoTamanhos(it);
     html += `<div data-sabores></div>`;
     html += blocoMassa();
     html += blocoBorda();
@@ -495,6 +549,7 @@ function atualizarModal() {
 function fecharModal() {
   $("[data-modal]").hidden = true;
   itemAtual = null;
+  modoPizzaPreset = null;
   if (!$("[data-carrinho]").dataset.aberto) document.body.classList.remove("travado");
 }
 
@@ -1185,6 +1240,20 @@ function enviarPedido(e) {
   st.textContent = "Abrindo o WhatsApp com seu pedido…";
   window.open(`https://wa.me/${LOJA.whatsapp}?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
 
+  /* se o cliente logou com o Google, guarda os dados e o histórico dele
+     (opcional, nunca trava quem não logou) */
+  if (window.salvarPedidoCliente) {
+    window.salvarPedidoCliente({
+      nome: f.nome.value.trim(), fone: formatarFone(f.fone.value),
+      endereco: f.endereco ? f.endereco.value.trim() : "",
+      numero: f.numero ? f.numero.value.trim() : "",
+      complemento: f.complemento ? f.complemento.value.trim() : "",
+      bairro: bairroEscolhido() || "",
+      resumo: `${tipo} · ${carrinho.reduce((s, l) => s + l.q, 0)} itens`,
+      total: totalDoPedido()
+    });
+  }
+
   /* confirmação na própria tela, para o cliente não ficar sem resposta
      caso o WhatsApp demore a abrir ou o navegador bloqueie a janela */
   mostrarConfirmacao(f.nome.value.trim());
@@ -1215,6 +1284,13 @@ function enviarPedidoDaMesa(f, st) {
     total: totalDoPedido()
   }).then(ok => {
     if (!ok) return avisoStatus("Não consegui enviar agora. Chame o garçom.");
+    if (window.salvarPedidoCliente) {
+      window.salvarPedidoCliente({
+        nome: f.nome ? f.nome.value.trim() : "",
+        resumo: `Mesa ${MESA_ATUAL} · ${carrinho.reduce((s, l) => s + l.q, 0)} itens`,
+        total: totalDoPedido()
+      });
+    }
     mostrarConfirmacao(f.nome ? f.nome.value.trim() : "", true);
     esvaziarDepoisDoEnvio();
   });
@@ -1537,4 +1613,11 @@ document.addEventListener("DOMContentLoaded", () => {
     prep.textContent = `⏱️ Fica pronto em cerca de ${LOJA.preparo}`;
   }
   form.pagamento.addEventListener("change", () => { troco.hidden = form.pagamento.value !== "Dinheiro"; });
+
+  /* QR Code do balcão (?modo=balcao): já abre com "Retirada no balcão"
+     marcado, pra quem está pedindo no local sem precisar escolher */
+  if (new URLSearchParams(location.search).get("modo") === "balcao") {
+    const r = document.querySelector('input[name="tipo"][value="Retirada no balcão"]');
+    if (r) { r.checked = true; r.dispatchEvent(new Event("change", { bubbles: true })); }
+  }
 });
