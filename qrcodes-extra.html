@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>QR Code do site e do balcão para imprimir | Pizzaria Vitória</title>
+<link rel="icon" href="assets/img/favicon.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0E0E10;color:#EDEAE2;font-family:"Inter",system-ui,sans-serif;padding:28px 18px 60px}
+  .topo{max-width:900px;margin:0 auto 22px;text-align:center}
+  .topo h1{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:26px;margin:0 0 6px;text-transform:uppercase}
+  .topo p{margin:0;opacity:.75;font-size:14px}
+  .grade{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+  .cartao{
+    background:#D42A20;color:#fff;border-radius:22px;padding:26px 22px 22px;
+    text-align:center;break-inside:avoid;page-break-inside:avoid;
+  }
+  .cartao img.logo{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:block}
+  .cartao h2{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:24px;margin:0 0 2px;text-transform:uppercase}
+  .cartao .sub{margin:0 0 16px;font-size:13px;font-weight:600;opacity:.9}
+  .qr{background:#fff;border-radius:14px;padding:14px;display:inline-block}
+  .qr svg{display:block;width:190px;height:190px}
+  .cartao .rodape{margin:14px 0 0;font-size:11.5px;font-weight:700;opacity:.85}
+  .fora{max-width:640px;margin:26px auto 0;text-align:center;color:rgba(237,234,226,.7);font-size:14px;line-height:1.6}
+  .fora button{
+    margin-top:12px;padding:13px 22px;border-radius:12px;border:0;cursor:pointer;
+    background:#D42A20;color:#fff;font:800 15px/1 "Inter",sans-serif;
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .fora{display:none}
+    .topo{display:none}
+    .grade{gap:14px;padding:14px}
+    .cartao{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <h1>QR Code do site e do balcão</h1>
+  <p>Um pra divulgar o site de pedidos, outro pra imprimir e deixar no balcão.</p>
+</div>
+
+<div class="grade">
+  <div class="cartao">
+    <img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" />
+    <h2>Peça pelo site</h2>
+    <p class="sub">Cardápio completo, delivery e retirada</p>
+    <div class="qr" data-qr="site"></div>
+    <p class="rodape">Pizzaria Vitória</p>
+  </div>
+  <div class="cartao">
+    <img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" />
+    <h2>Peça no balcão</h2>
+    <p class="sub">Já abre certinho em "Retirada no balcão"</p>
+    <div class="qr" data-qr="balcao"></div>
+    <p class="rodape">Pizzaria Vitória</p>
+  </div>
+</div>
+
+<div class="fora">
+  <p>Funciona em papel A4 comum, pra colar no balcão ou usar num cartaz.</p>
+  <button type="button" onclick="window.print()">🖨️ Imprimir</button>
+</div>
+
+<script src="assets/js/qrcode-lib.js"></script>
+<script>
+(function () {
+  var base = location.href.replace(/[^/]*$/, "") + "index.html";
+  var alvos = { site: base, balcao: base + "?modo=balcao" };
+  Object.keys(alvos).forEach(function (chave) {
+    var qr = qrcode(0, "H");
+    qr.addData(alvos[chave]);
+    qr.make();
+    document.querySelector('[data-qr="' + chave + '"]').innerHTML = qr.createSvgTag(4);
+  });
+})();
+</script>
+
+</body>
+</html>
