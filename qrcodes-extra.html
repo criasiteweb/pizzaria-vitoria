@@ -11,24 +11,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
 <style>
   *{box-sizing:border-box}
-  body{margin:0;background:#0E0E10;color:#EDEAE2;font-family:"Inter",system-ui,sans-serif;padding:28px 18px 60px}
-  .topo{max-width:900px;margin:0 auto 22px;text-align:center}
-  .topo h1{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:26px;margin:0 0 6px;text-transform:uppercase}
-  .topo p{margin:0;opacity:.75;font-size:14px}
-  .grade{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+  body{margin:0;background:#120C0A;color:#F1EBE1;font-family:"Inter",system-ui,sans-serif;padding:32px 18px 64px}
+  .topo{max-width:680px;margin:0 auto 28px;text-align:center}
+  .topo h1{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:28px;margin:0 0 6px;text-transform:uppercase;letter-spacing:.02em}
+  .topo p{margin:0;opacity:.62;font-size:14px}
+  .grade{max-width:680px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
   .cartao{
-    background:#D42A20;color:#fff;border-radius:22px;padding:26px 22px 22px;
-    text-align:center;break-inside:avoid;page-break-inside:avoid;
+    position:relative;background:#1B1310;border:1px solid rgba(255,255,255,.08);border-radius:24px;
+    padding:0 0 22px;text-align:center;overflow:hidden;
+    break-inside:avoid;page-break-inside:avoid;
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
   }
-  .cartao img.logo{width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:block}
-  .cartao h2{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:24px;margin:0 0 2px;text-transform:uppercase}
-  .cartao .sub{margin:0 0 16px;font-size:13px;font-weight:600;opacity:.9}
+  .cartao .faixa{
+    background:linear-gradient(135deg,#D42A20,#E8493C);padding:20px 16px 36px;position:relative;
+  }
+  .cartao .faixa h2{
+    font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:24px;color:#fff;margin:0;
+    letter-spacing:.02em;text-transform:uppercase;line-height:1.15;
+  }
+  .cartao .faixa small{display:block;font-family:"Inter",sans-serif;font-size:11px;font-weight:800;
+    letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:6px}
+  .cartao .logo{
+    width:60px;height:60px;border-radius:50%;border:3px solid #1B1310;
+    position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);
+    box-shadow:0 6px 16px rgba(0,0,0,.4);background:#1B1310;
+  }
+  .cartao .corpo{padding:40px 18px 0}
+  .cartao .sub{margin:0 0 16px;font-size:12.5px;font-weight:700;color:rgba(241,235,225,.65);
+    text-transform:uppercase;letter-spacing:.08em}
   .qr{background:#fff;border-radius:14px;padding:14px;display:inline-block}
-  .qr svg{display:block;width:190px;height:190px}
-  .cartao .rodape{margin:14px 0 0;font-size:11.5px;font-weight:700;opacity:.85}
-  .fora{max-width:640px;margin:26px auto 0;text-align:center;color:rgba(237,234,226,.7);font-size:14px;line-height:1.6}
+  .qr svg{display:block;width:180px;height:180px}
+  .cartao .rodape{margin:14px 0 0;font-size:11px;font-weight:700;color:rgba(241,235,225,.5)}
+  .fora{max-width:680px;margin:28px auto 0;text-align:center;color:rgba(241,235,225,.65);font-size:14px;line-height:1.6}
   .fora button{
-    margin-top:12px;padding:13px 22px;border-radius:12px;border:0;cursor:pointer;
+    margin-top:12px;padding:13px 24px;border-radius:999px;border:0;cursor:pointer;
     background:#D42A20;color:#fff;font:800 15px/1 "Inter",sans-serif;
   }
   @media print{
@@ -49,18 +65,22 @@
 
 <div class="grade">
   <div class="cartao">
-    <img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" />
-    <h2>Peça pelo site</h2>
-    <p class="sub">Cardápio completo, delivery e retirada</p>
-    <div class="qr" data-qr="site"></div>
-    <p class="rodape">Pizzaria Vitória</p>
+    <div class="faixa"><small>Pizzaria Vitória</small><h2>Peça pelo site</h2>
+      <img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" /></div>
+    <div class="corpo">
+      <p class="sub">Cardápio completo · delivery e retirada</p>
+      <div class="qr" data-qr="site"></div>
+      <p class="rodape">Pizzaria Vitória</p>
+    </div>
   </div>
   <div class="cartao">
-    <img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" />
-    <h2>Peça no balcão</h2>
-    <p class="sub">Já abre certinho em "Retirada no balcão"</p>
-    <div class="qr" data-qr="balcao"></div>
-    <p class="rodape">Pizzaria Vitória</p>
+    <div class="faixa"><small>Pizzaria Vitória</small><h2>Peça no balcão</h2>
+      <img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" /></div>
+    <div class="corpo">
+      <p class="sub">Já abre em "Retirada no balcão"</p>
+      <div class="qr" data-qr="balcao"></div>
+      <p class="rodape">Pizzaria Vitória</p>
+    </div>
   </div>
 </div>
 
