@@ -205,6 +205,9 @@ const ehCombo   = it => !!(it && it.pzcombo);
 const precoSabor = (it, tamId) => ehPizza(it) ? Number((it.t || {})[tamId] || 0) : Number(it.p || 0);
 const precoDe    = it => ehPizza(it) ? Number((it.t || {})[TAMANHOS[0].id] || 0) : Number(it.p || 0);
 const saboresDoGrupo = g => CARDAPIO.filter(i => i.g === g && i.pz && !i.off);
+/* meio a meio livre: salgada com doce também vale, é comum o cliente pedir
+   assim (pedido do Matheus, 25/09/2026) */
+const todosSaboresPizza = () => CARDAPIO.filter(i => i.pz && !i.off);
 
 function tamEscolhido() {
   if (itemAtual && ehCombo(itemAtual)) return itemAtual.pzcombo;
@@ -320,7 +323,7 @@ function blocoSabores(it) {
       <p class="extras-ajuda">No tamanho ${t.n} vai 1 sabor só: <b>${it.n}</b>.</p>
     </div>`;
   }
-  const lista = saboresDoGrupo(it.g).filter(s => s.id !== it.id);
+  const lista = todosSaboresPizza().filter(s => s.id !== it.id);
   return `<div class="extras-bloco">
     <p class="extras-titulo">Meio a meio</p>
     <p class="extras-ajuda">O tamanho ${t.n} aceita até ${t.sabores} sabores. Você paga o preço do sabor mais caro, sem taxa nenhuma a mais.</p>
