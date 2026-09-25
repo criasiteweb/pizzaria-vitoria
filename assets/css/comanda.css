@@ -5,7 +5,7 @@
 :root{
   --preto:#0E0E10; --carvao:#16171B; --giz:#1E2025; --giz-claro:#26282E;
   --linha:rgba(255,255,255,.09);
-  --amarelo:#FFC20E; --amarelo-forte:#FFD34D; --vermelho:#D8261C; --verde:#2FA96B;
+  --amarelo:#D42A20; --amarelo-forte:#E8493C; --vermelho:#D8261C; --verde:#2FA96B;
   --texto:#EDEAE2; --texto-suave:rgba(237,234,226,.62);
   --raio:14px; --raio-g:22px;
 }
@@ -54,7 +54,7 @@ button{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
 }
 button:active{transform:translateY(1px)}
-button.principal{background:var(--amarelo);color:#161200;border-color:transparent}
+button.principal{background:var(--amarelo);color:#fff;border-color:transparent}
 button.forte{background:var(--vermelho);color:#fff;border-color:transparent}
 button.larga{flex-basis:100%}
 
@@ -209,7 +209,7 @@ details.guia strong{color:var(--texto)}
 }
 .cmd-aba b{ font-size: .8rem; font-weight: 700; }
 .cmd-aba i{ font-size: .7rem; opacity: .65; font-style: normal; }
-.cmd-aba.ativa{ background: #FFC20E; color: #17171B; border-color: #FFC20E; }
+.cmd-aba.ativa{ background: var(--amarelo); color: #fff; border-color: var(--amarelo); }
 .cmd-aba.ativa i{ opacity: .8; }
 .cmd-aba.nova{ background: transparent; border-style: dashed; align-self: stretch; }
 
@@ -238,7 +238,7 @@ details.guia strong{color:var(--texto)}
   padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: .74rem;
   background: #1C1C21; color: #EDEAE2; border: 1px solid rgba(237,234,226,.14);
 }
-.cmd-grupos button.ativo{ background: #FFC20E; color: #17171B; border-color: #FFC20E; font-weight: 700; }
+.cmd-grupos button.ativo{ background: var(--amarelo); color: #fff; border-color: var(--amarelo); font-weight: 700; }
 
 .cmd-itens{ display: grid; gap: 6px; max-height: 46vh; overflow-y: auto; padding-right: 4px; }
 .cmd-item{
@@ -248,9 +248,9 @@ details.guia strong{color:var(--texto)}
   font-size: .78rem; line-height: 1.3;
 }
 .cmd-item > span{ min-width: 0; overflow-wrap: anywhere; }
-.cmd-item:hover{ border-color: #FFC20E; }
+.cmd-item:hover{ border-color: var(--amarelo); }
 .cmd-item:active{ transform: scale(.99); }
-.cmd-item b{ color: #FFC20E; white-space: nowrap; }
+.cmd-item b{ color: var(--amarelo); white-space: nowrap; }
 .cmd-avulso{
   width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; cursor: pointer;
   background: transparent; color: #EDEAE2; border: 1px dashed rgba(237,234,226,.3); font-size: .85rem;
@@ -272,7 +272,7 @@ details.guia strong{color:var(--texto)}
 .cmd-nome{ display: grid; flex: 1 1 auto; min-width: 0; }
 .cmd-nome span{ font-size: .82rem; line-height: 1.3; overflow-wrap: anywhere; }
 .cmd-nome i{ font-size: .72rem; opacity: .7; font-style: normal; overflow-wrap: anywhere; }
-.cmd-valor{ color: #FFC20E; font-size: .84rem; white-space: nowrap; }
+.cmd-valor{ color: var(--amarelo); font-size: .84rem; white-space: nowrap; }
 
 /* os dois botõezinhos ficam na terceira coluna, um do lado do outro */
 .cmd-obs, .cmd-tira{
@@ -297,14 +297,14 @@ details.guia strong{color:var(--texto)}
   background: #1C1C21; color: #EDEAE2; border: 1px solid rgba(237,234,226,.14);
 }
 .cmd-tipos button.ativo, .cmd-pagto button.ativo{
-  background: #FFC20E; color: #17171B; border-color: #FFC20E; font-weight: 700;
+  background: var(--amarelo); color: #fff; border-color: var(--amarelo); font-weight: 700;
 }
 
 /* ---- totais ---- */
 .cmd-totais{ margin: 14px 0; display: grid; gap: 5px; }
 .cmd-total-linha{ display: flex; justify-content: space-between; font-size: .9rem; }
 .cmd-total-linha.geral{ font-size: 1.05rem; font-weight: 700; padding-top: 6px; border-top: 1px solid rgba(237,234,226,.14); }
-.cmd-total-linha.geral b{ color: #FFC20E; }
+.cmd-total-linha.geral b{ color: var(--amarelo); }
 .cmd-total-linha.troco b{ color: #7BE08F; }
 .cmd-total-linha.falta b{ color: #FF8A7A; }
 
@@ -313,7 +313,7 @@ details.guia strong{color:var(--texto)}
   padding: 9px; border-radius: 9px; cursor: pointer; font-size: .82rem; font-weight: 600;
   background: #1C1C21; color: #EDEAE2; border: 1px solid rgba(237,234,226,.16);
 }
-.cmd-botoes .principal{ background: #FFC20E; color: #17171B; border-color: #FFC20E; }
+.cmd-botoes .principal{ background: var(--amarelo); color: #fff; border-color: var(--amarelo); }
 .cmd-botoes .cmd-fechar{ border-color: rgba(255,138,122,.4); color: #FF8A7A; }
 
 .cmd-colar{ margin-top: 14px; }
@@ -338,7 +338,7 @@ details.guia strong{color:var(--texto)}
 
 /* taxa por bairro: não se digita aqui, vem da tabela do site */
 .cmd-taxa-aviso{ display: grid; gap: 3px; margin: 0; }
-.cmd-taxa-aviso b{ font-size: .95rem; color: #FFC20E; }
+.cmd-taxa-aviso b{ font-size: .95rem; color: var(--amarelo); }
 .cmd-taxa-aviso i{ font-size: .74rem; opacity: .6; font-style: normal; line-height: 1.35; }
 
 /* ---- histórico de comandas fechadas ---- */
@@ -350,7 +350,7 @@ details.guia strong{color:var(--texto)}
   border-radius: 11px; padding: 10px 11px; display: grid; gap: 6px;
 }
 .cmd-hist-topo{ display: flex; align-items: baseline; gap: 8px; font-size: .86rem; }
-.cmd-hist-topo b{ color: #FFC20E; }
+.cmd-hist-topo b{ color: var(--amarelo); }
 .cmd-hist-topo span{ flex: 1; overflow-wrap: anywhere; }
 .cmd-hist-topo i{ font-style: normal; opacity: .55; font-size: .75rem; }
 .cmd-hist-baixo{ display: flex; justify-content: space-between; align-items: center; font-size: .85rem; }
@@ -374,7 +374,7 @@ details.guia strong{color:var(--texto)}
   background: #1C1C21; color: #EDEAE2; border: 1px solid rgba(237,234,226,.16);
 }
 .cx-mes-abre i{ font-style: normal; opacity: .6; }
-.cx-mes-abre.aberto{ border-color: #FFC20E; color: #FFC20E; }
+.cx-mes-abre.aberto{ border-color: var(--amarelo); color: var(--amarelo); }
 
 .cx-calendario{
   width: min(300px, 100%);
@@ -395,4 +395,4 @@ details.guia strong{color:var(--texto)}
   background: #1C1C21; color: #EDEAE2; border: 1px solid rgba(237,234,226,.12);
 }
 .cx-cal-grade button:disabled{ opacity: .22; cursor: default; }
-.cx-cal-grade button.ativo{ background: #FFC20E; color: #17171B; border-color: #FFC20E; font-weight: 700; }
+.cx-cal-grade button.ativo{ background: var(--amarelo); color: #fff; border-color: var(--amarelo); font-weight: 700; }
