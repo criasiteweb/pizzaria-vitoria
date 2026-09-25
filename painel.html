@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex, nofollow" />
 <title>Painel de Pedidos | Pizzaria Vitória</title>
 <link rel="icon" href="assets/img/favicon.png" type="image/png" />
-<link rel="apple-touch-icon" href="assets/img/logo.png" />
+<link rel="apple-touch-icon" href="assets/img/logo.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -28,7 +28,7 @@
 <!-- ============ tela de entrada ============ -->
 <section class="login" data-tela-login hidden>
   <form class="caixa-login" data-form-login>
-    <img src="assets/img/logo.png" alt="" width="72" height="72" />
+    <img src="assets/img/logo.jpg" alt="" width="72" height="72" />
     <h1>Painel de Pedidos</h1>
     <p>Os pedidos do site chegam aqui na hora.</p>
     <label>
@@ -45,27 +45,29 @@
 <div data-tela-painel hidden>
 
   <header class="topo">
-    <img src="assets/img/logo.png" alt="" width="38" height="38" />
+    <img src="assets/img/logo.jpg" alt="" width="38" height="38" />
     <span class="marca">
       <small>Pizzaria Vitória</small>
       <strong>Pedidos <b class="contador" data-contador></b></strong>
     </span>
     <span class="conexao" data-conexao data-ok="nao">Conectando…</span>
     <button type="button" class="loja-estado" data-loja-estado aria-pressed="true">Loja aberta</button>
-    <button type="button" class="sair" data-impressao aria-pressed="true" title="Ligar ou desligar a impressão automática da comanda">Impressão ligada</button>
+    <button type="button" class="sair" data-impressao aria-pressed="true" title="Ligar ou desligar a impressão automática ao aceitar pedido do site">Impressão ligada</button>
     <button type="button" class="sair" data-atualizar title="Buscar a versão mais nova do sistema">Atualizar</button>
     <button type="button" class="sair" data-trocar-senha title="Trocar a senha da loja">Senha</button>
+    <button type="button" class="sair" data-acesso-privado title="Caixa, Histórico e Cardápio ficam atrás de uma segunda senha">Acesso privado</button>
+    <button type="button" class="sair" data-trocar-senha-privada hidden title="Trocar a senha do acesso privado">Senha privada</button>
     <button type="button" class="sair" data-sair>Sair</button>
   </header>
 
   <div class="barra">
     <div class="filtros">
       <button type="button" data-filtro="abertos" aria-pressed="true">Em aberto</button>
+      <button type="button" data-filtro="balcao" aria-pressed="false">Balcão</button>
       <button type="button" data-filtro="todos" aria-pressed="false">Todos de hoje</button>
-      <button type="button" data-filtro="historico" aria-pressed="false">Histórico</button>
-      <button type="button" data-filtro="caixa" aria-pressed="false">Caixa</button>
-      <button type="button" data-filtro="balcao" aria-pressed="false">Comanda</button>
-      <button type="button" data-filtro="cardapio" aria-pressed="false">Cardápio</button>
+      <button type="button" data-filtro="historico" aria-pressed="false" data-so-privado hidden>Histórico</button>
+      <button type="button" data-filtro="caixa" aria-pressed="false" data-so-privado hidden>Caixa</button>
+      <button type="button" data-filtro="cardapio" aria-pressed="false" data-so-privado hidden>Cardápio</button>
       <label class="caixa-data" data-caixa-data hidden>
         <span>Dia</span>
         <input type="date" data-data />
@@ -174,8 +176,8 @@
         <div class="cmd-totais" data-totais></div>
 
         <div class="cmd-botoes">
-          <button type="button" class="principal larga" data-imprimir>Imprimir comanda</button>
-          <button type="button" class="cmd-fechar" data-fechar-comanda>Fechar comanda</button>
+          <button type="button" class="cmd-fechar" data-fechar-comanda>Salvar</button>
+          <button type="button" class="principal larga" data-imprimir>Imprimir</button>
         </div>
         <p class="aviso" data-aviso hidden></p>
 
@@ -204,7 +206,7 @@
     <details class="guia">
       <summary>Como deixar a impressora pronta</summary>
       <ol>
-        <li><strong>No computador</strong>: ligue a impressora pelo cabo USB e instale o driver que veio com ela. Depois é só usar o botão “Imprimir comanda”, escolher a GS-T80EBT e mandar.</li>
+        <li><strong>No computador</strong>: ligue a impressora Epson TM-T20X pelo cabo USB e instale o driver que veio com ela. Depois é só usar o botão “Imprimir”, escolher a TM-T20X e mandar.</li>
         <li><strong>Cartaz com QR Code</strong> para colar no balcão: <a href="qrcode.html" target="_blank" rel="noopener">abrir para imprimir</a>.</li>
       </ol>
     </details>
