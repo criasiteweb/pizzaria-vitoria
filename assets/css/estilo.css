@@ -1,13 +1,13 @@
 :root{
-  /* Paleta da pizzaria: preto morno de forno, dourado de massa assada
-     e vermelho de molho. Trocar aqui muda o site inteiro. */
+  /* Paleta da pizzaria: fundo preto, vermelho e verde do logo.
+     Trocar aqui muda o site inteiro. */
   --preto:#120C0A;
   --carvao:#1B1310;
   --giz:#241A16;
   --giz-claro:#2F221C;
   --linha:rgba(255,255,255,.10);
-  --amarelo:#E9A93C;
-  --amarelo-forte:#F6C874;
+  --amarelo:#2E8B4F;
+  --amarelo-forte:#4CAF50;
   --vermelho:#D42A20;
   --laranja:#DC5A1E;
   --creme:#F8F2E7;
