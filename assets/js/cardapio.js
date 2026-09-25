@@ -20,16 +20,20 @@ const TAMANHOS = [
 /* ---------- borda ----------
    Borda de catupiry é grátis em todas as pizzas. Bordas recheadas
    (doces ou catupiry original) custam R$ 10,00 à parte. */
-const BORDAS = [
-  { n: "Borda de catupiry (grátis)",       p: 0 },
+const BORDA_GRATIS = { n: "Borda de catupiry (grátis)", p: 0 };
+const BORDA_SEM    = { n: "Sem borda recheada", p: 0 };
+const BORDAS_SALGADA = [
+  BORDA_GRATIS,
+  { n: "Borda recheada — Catupiry original", p: 10.00 },
+  BORDA_SEM
+];
+const BORDAS_DOCE = [
+  BORDA_GRATIS,
   { n: "Borda recheada — Chocolate",        p: 10.00 },
   { n: "Borda recheada — Chocolate branco", p: 10.00 },
   { n: "Borda recheada — Creme de avelã",   p: 10.00 },
-  { n: "Borda recheada — Catupiry original",p: 10.00 },
-  { n: "Sem borda recheada",                p: 0 }
+  BORDA_SEM
 ];
-
-const MASSAS = ["Tradicional", "Fina"];
 
 /* ---------- acréscimos da pizza ---------- */
 const ADD_PIZZA = [
@@ -58,8 +62,8 @@ const TAXA_MEIO_A_MEIO_BROTO = 1.00;
 /* ---- grupos do cardápio ---- */
 const GRUPOS = [
   { id: "promocoes", rotulo: "Promoção",      titulo: "Promoção",       nota: "Promoção por tempo indeterminado, direto do folheto da casa." },
-  { id: "salgadas",  rotulo: "Salgadas",     titulo: "Pizzas salgadas", nota: "68 sabores. Meio a meio cobra o valor do sabor mais caro no Grande, e + R$ 1,00 no Broto. Todas com borda de catupiry grátis." },
-  { id: "doces",     rotulo: "Doces",        titulo: "Pizzas doces",   nota: "31 sabores. Meio a meio também vale entre dois sabores doces." },
+  { id: "salgadas",  rotulo: "Salgadas",     titulo: "Pizzas salgadas", nota: "68 sabores. Toque num sabor pra escolher o tamanho e, se quiser, fazer meio a meio (vale até com sabor doce). Meio a meio cobra o valor do sabor mais caro no Grande, e + R$ 1,00 no Broto. Todas com borda de catupiry grátis." },
+  { id: "doces",     rotulo: "Doces",        titulo: "Pizzas doces",   nota: "31 sabores. Meio a meio vale com outro doce ou até com um salgado." },
   { id: "lanches",   rotulo: "Lanches",      titulo: "Lanches",        nota: "Acréscimo de R$ 3,00 cada: presunto, queijo, catupiry, cheddar e bacon." },
   { id: "pasteis",   rotulo: "Pastéis",      titulo: "Pastéis",        nota: "" },
   { id: "pasteisdoces", rotulo: "Pastéis doces", titulo: "Pastéis doces", nota: "" },
