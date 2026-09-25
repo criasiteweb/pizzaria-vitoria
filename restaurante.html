@@ -17,11 +17,17 @@
   document.write('<link rel="stylesheet" href="assets/css/estilo.css?t=' + t + '">'); })();
 </script>
 <noscript><link rel="stylesheet" href="assets/css/estilo.css" /></noscript>
+<style>
+  /* Esta página não tem a foto de capa grande do site principal, que é o
+     que "absorve" o cabeçalho fixo lá. Aqui o cabeçalho ficaria por cima
+     do título, então reserva o espaço dele no topo do conteúdo. */
+  main{padding-top:74px}
+</style>
 </head>
 <body>
 <div class="barra-progresso" aria-hidden="true"><i></i></div>
 
-<header class="topo" data-topo>
+<header class="topo" data-topo data-fixo="true">
   <a class="marca" href="#inicio" aria-label="Pizzaria Vitória — início">
     <img src="assets/img/logo.jpg" alt="" width="44" height="44" />
     <span>
