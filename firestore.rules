@@ -74,6 +74,13 @@ service cloud.firestore {
       allow write: if ehALoja();
     }
 
+    /* Segunda senha do "Acesso privado" (Caixa, Histórico e Cardápio).
+       Só quem já está logado como a loja no painel consegue ler ou trocar,
+       nunca o site do cliente. */
+    match /config/painel {
+      allow read, write: if ehALoja();
+    }
+
     /* qualquer outro caminho fica fechado */
     match /{documento=**} {
       allow read, write: if false;
