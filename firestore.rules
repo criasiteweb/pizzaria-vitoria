@@ -74,6 +74,27 @@ service cloud.firestore {
       allow write: if ehALoja();
     }
 
+    /* Pedido feito pela mesa (restaurante.html). Cada documento é uma
+       rodada de pedido daquela mesa, que o painel importa pra dentro da
+       comanda e marca como "importado". Sem dado pessoal obrigatório. */
+    function pedidoMesaValido(d) {
+      return d.keys().hasOnly(['mesa','cliente','itens','total','status','criadoEm'])
+          && d.mesa is int && d.mesa >= 1 && d.mesa <= 13
+          && d.status == 'novo'
+          && d.cliente is string && d.cliente.size() <= 80
+          && d.itens is list && d.itens.size() >= 1 && d.itens.size() <= 100
+          && d.total is number && d.total >= 0 && d.total <= 100000
+          && d.criadoEm == request.time;
+    }
+
+    match /pedidos_mesa/{pedido} {
+      allow create: if pedidoMesaValido(request.resource.data);
+      allow get, list: if ehALoja();
+      allow update: if ehALoja()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      allow delete: if ehALoja();
+    }
+
     /* Segunda senha do "Acesso privado" (Caixa, Histórico e Cardápio).
        Só quem já está logado como a loja no painel consegue ler ou trocar,
        nunca o site do cliente. */
