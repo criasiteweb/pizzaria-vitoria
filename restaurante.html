@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#120C0A" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Pizzaria Vitória | Cardápio da mesa</title>
+<link rel="icon" href="assets/img/favicon.png" type="image/png" />
+<link rel="apple-touch-icon" href="assets/img/logo.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script>
+(function(){ var t = Math.floor(Date.now() / 120000);
+  document.write('<link rel="stylesheet" href="assets/css/estilo.css?t=' + t + '">'); })();
+</script>
+<noscript><link rel="stylesheet" href="assets/css/estilo.css" /></noscript>
+</head>
+<body>
+<div class="barra-progresso" aria-hidden="true"><i></i></div>
+
+<header class="topo" data-topo>
+  <a class="marca" href="#inicio" aria-label="Pizzaria Vitória — início">
+    <img src="assets/img/logo.jpg" alt="" width="44" height="44" />
+    <span>
+      <strong>Vitória</strong>
+      <small data-mesa-titulo>Mesa</small>
+    </span>
+  </a>
+  <button class="btn-carrinho" type="button" data-abrir-carrinho aria-label="Abrir carrinho">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.6 9H8.2L6 3H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/></svg>
+    <span data-contador>0</span>
+  </button>
+</header>
+
+<main id="inicio">
+
+  <section class="faixa" aria-label="Informações rápidas">
+    <div><b data-mesa-numero>Mesa</b><small>peça quantas vezes quiser</small></div>
+    <div><b>Sem pagamento agora</b><small>a conta fecha no final, com o garçom</small></div>
+  </section>
+
+  <section id="cardapio" class="secao">
+    <div class="titulo-secao" data-surge>
+      <p class="chamada">Cardápio da mesa</p>
+      <h2>Faça seu pedido</h2>
+      <p class="apoio">Toque na pizza para fazer meio a meio, escolher a massa e a borda. Cada pedido enviado já vai direto para a cozinha. <span class="ilustrativa">Imagens ilustrativas.</span></p>
+    </div>
+
+    <div class="filtros" role="tablist" aria-label="Filtrar cardápio" data-filtros></div>
+    <div class="cardapio" data-cardapio></div>
+  </section>
+
+  <section id="combos" class="secao promo" data-surge>
+    <div class="promo-topo">
+      <p class="promo-tarja">🔥 Promoção da casa</p>
+      <h2>Promoções do dia</h2>
+      <p class="promo-apoio">
+        Pizza grande por <b>R$ 55,00</b> em seis sabores escolhidos, e <b>você monta meio a meio</b> entre eles.
+        A partir de <b data-combo-apartir>R$ 55,00</b>.
+      </p>
+    </div>
+    <div class="promo-vitrine" data-vitrine-combos></div>
+    <p class="promo-rodape">Promoção por tempo indeterminado, conforme o folheto da casa.</p>
+  </section>
+
+  <section class="secao fidelidade" aria-labelledby="t-fid" data-surge hidden>
+    <div class="fid-caixa">
+      <p class="chamada">Programa de fidelidade</p>
+      <h2 id="t-fid">Seu cartão de selos</h2>
+      <div class="selos-linha" data-selos aria-hidden="true"></div>
+      <p class="fid-conta" data-fid-conta></p>
+      <p class="fid-regra"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <img src="assets/img/logo.jpg" alt="Pizzaria Vitória" width="60" height="60" />
+  <p class="slogan">Pedido direto da sua mesa</p>
+  <small>Criado por <a href="https://criasite.site/cria-site-vitrine" target="_blank" rel="noopener">Cria Site</a></small>
+</footer>
+
+<button class="flutuante" type="button" data-abrir-carrinho hidden data-flutuante>
+  <span class="fl-esq">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-1.6 9H8.2L6 3H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9.5" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/></svg>
+    <b data-contador>0</b> itens
+  </span>
+  <b data-total-flutuante>R$ 0,00</b>
+</button>
+
+<div class="veu" data-veu hidden></div>
+
+<aside class="carrinho" data-carrinho aria-label="Seu pedido" aria-hidden="true">
+  <div class="carrinho-topo">
+    <div>
+      <p class="chamada" data-mesa-titulo-carrinho>Mesa</p>
+      <h2>Seu pedido</h2>
+    </div>
+    <button class="fechar" type="button" data-fechar-carrinho aria-label="Fechar carrinho">×</button>
+  </div>
+  <form class="checkout" data-checkout novalidate>
+    <div class="carrinho-corpo">
+      <div class="carrinho-itens" data-itens></div>
+      <div class="checkout-campos">
+        <label>Seu nome <small>(opcional)</small>
+          <input name="nome" type="text" placeholder="Como te chamamos?" autocomplete="name" />
+        </label>
+        <label hidden>Seu WhatsApp
+          <input name="fone" type="tel" inputmode="numeric" placeholder="(11) 99999-9999" autocomplete="tel" />
+        </label>
+        <fieldset class="opcoes" hidden>
+          <legend>Como você quer receber?</legend>
+          <label class="radio"><input type="radio" name="tipo" value="Entrega" /><span>🛵 Entrega</span></label>
+          <label class="radio"><input type="radio" name="tipo" value="Retirada no balcão" /><span>🏠 Retirada</span></label>
+          <label class="radio"><input type="radio" name="tipo" value="No restaurante" checked /><span>🍽️ No restaurante</span></label>
+        </fieldset>
+        <div class="caixa-mesa" data-caixa-mesa hidden>
+          <b>Comer aqui no restaurante</b>
+          <span>É só chegar e falar o seu nome no balcão — o pedido sai para você.</span>
+        </div>
+        <div class="caixa-retirada" data-caixa-retirada hidden>
+          <b>Retirar no balcão</b>
+          <span>Rua Pedro Rípoli, 104<br />Barro Branco · Ribeirão Pires — SP</span>
+          <span class="ir-ate-botoes compacto">
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Rua%20Pedro%20R%C3%ADpoli%2C%20104%20-%20Barro%20Branco%2C%20Ribeir%C3%A3o%20Pires%20-%20SP%2C%2009407-100" target="_blank" rel="noopener">🗺️ Google Maps</a>
+            <a href="https://www.waze.com/ul?q=Rua%20Pedro%20R%C3%ADpoli%2C%20104%20-%20Barro%20Branco%2C%20Ribeir%C3%A3o%20Pires%20-%20SP%2C%2009407-100&navigate=yes" target="_blank" rel="noopener">🚗 Waze</a>
+          </span>
+        </div>
+        <div data-campos-entrega hidden>
+          <label>CEP
+            <input name="cep" type="text" inputmode="numeric" placeholder="00000-000" autocomplete="postal-code" maxlength="9" />
+          </label>
+          <p class="busca-bairro" data-busca-cep hidden></p>
+          <label>Cidade
+            <select name="cidade" data-cidade></select>
+          </label>
+          <div class="dupla dupla-rua">
+            <label>Rua
+              <input name="endereco" type="text" placeholder="Nome da rua" autocomplete="street-address" />
+            </label>
+            <label>Número
+              <input name="numero" type="text" inputmode="numeric" placeholder="123" autocomplete="off" />
+            </label>
+          </div>
+          <p class="busca-bairro" data-busca-bairro hidden></p>
+          <label>Bairro
+            <select name="bairro" data-bairro></select>
+          </label>
+          <label data-campo-outro hidden>Qual é o seu bairro?
+            <input name="bairroOutro" type="text" placeholder="Digite o nome do bairro" />
+          </label>
+          <label>Complemento
+            <input name="complemento" type="text" placeholder="Apto, bloco, ponto de referência (opcional)" />
+          </label>
+          <p class="aviso-entrega" data-aviso-entrega hidden></p>
+        </div>
+        <label hidden>Forma de pagamento
+          <select name="pagamento">
+            <option>Pix</option>
+            <option>Dinheiro</option>
+            <option>Cartão na entrega</option>
+          </select>
+        </label>
+        <label data-campo-troco hidden>Troco para quanto?
+          <input name="troco" type="text" inputmode="decimal" placeholder="Ex: R$ 100,00 — ou deixe vazio se não precisa" />
+        </label>
+        <label>Observações
+          <input name="obs" type="text" placeholder="Ex: sem cebola, ponto da carne, tocar o interfone..." />
+        </label>
+      </div>
+    </div>
+    <div class="carrinho-rodape">
+      <div class="cupom" hidden>
+        <div class="cupom-linha">
+          <input type="text" data-campo-cupom placeholder="Tem um cupom? Digite aqui" autocomplete="off" aria-label="Cupom de desconto" />
+          <button type="button" class="botao contorno" data-aplicar-cupom>Aplicar</button>
+        </div>
+        <p class="cupom-aviso" data-cupom-aviso hidden role="status"></p>
+      </div>
+      <div class="linha-total"><span>Subtotal</span><b data-subtotal>R$ 0,00</b></div>
+      <div class="linha-total linha-taxa" data-linha-taxa hidden><span>Taxa de entrega</span><b data-taxa-valor>—</b></div>
+      <div class="linha-total linha-desconto" data-linha-desconto hidden><span data-desconto-rot>Desconto</span><b data-desconto-valor>—</b></div>
+      <div class="linha-total linha-geral" data-linha-geral hidden><span>Total</span><b data-total-geral>R$ 0,00</b></div>
+      <p class="aviso-taxa" data-pendente hidden></p>
+      <p class="tempo-preparo" data-preparo hidden></p>
+      <button class="botao primario grande" type="submit" data-enviar>Enviar para a cozinha</button>
+      <p class="status" data-status role="status" aria-live="polite"></p>
+    </div>
+  </form>
+</aside>
+
+<div class="modal" data-modal hidden role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+  <div class="modal-caixa">
+    <button class="fechar" type="button" data-fechar-modal aria-label="Fechar">×</button>
+    <img class="modal-foto" data-modal-foto src="" alt="" width="560" height="420" />
+    <p class="chamada" data-modal-cat></p>
+    <h3 id="modal-titulo" data-modal-nome></h3>
+    <p class="modal-desc" data-modal-desc></p>
+    <div data-modal-extras></div>
+    <label class="modal-obs">Observação para este item
+      <input type="text" data-modal-obs placeholder="Ex: sem cebola, bem assada, cortar em 8..." />
+    </label>
+    <div class="modal-rodape">
+      <div class="qtd" role="group" aria-label="Quantidade">
+        <button type="button" data-qtd="-1" aria-label="Menos um">−</button>
+        <b data-modal-qtd>1</b>
+        <button type="button" data-qtd="1" aria-label="Mais um">+</button>
+      </div>
+      <button class="botao primario" type="button" data-modal-add>Adicionar · <b data-modal-total>R$ 0,00</b></button>
+    </div>
+  </div>
+</div>
+
+<div class="veu" data-sem-mesa hidden style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#120C0A;color:#F1EBE1;text-align:center;padding:24px">
+  <div>
+    <p style="font-size:1.2rem;font-weight:800">Link incompleto</p>
+    <p>Escaneie o QR Code da sua mesa para abrir o cardápio.</p>
+  </div>
+</div>
+
+<script>
+(function(){ var t = Math.floor(Date.now() / 120000);
+  document.write('<script src="assets/js/cardapio.js?t=' + t + '"><\/script>');
+  document.write('<script src="assets/js/app.js?t=' + t + '"><\/script>'); })();
+</script>
+<script type="module" src="assets/js/mesa.js?v=1"></script>
+<script>
+(function(){
+  var m = new URLSearchParams(location.search).get("mesa");
+  if (!m || !/^([1-9]|1[0-3])$/.test(m)) {
+    document.querySelector("[data-sem-mesa]").hidden = false;
+    return;
+  }
+  document.querySelectorAll("[data-mesa-titulo]").forEach(function(e){ e.textContent = "Mesa " + m; });
+  document.querySelectorAll("[data-mesa-numero]").forEach(function(e){ e.textContent = "Mesa " + m; });
+  document.querySelectorAll("[data-mesa-titulo-carrinho]").forEach(function(e){ e.textContent = "Mesa " + m; });
+})();
+</script>
+</body>
+</html>
