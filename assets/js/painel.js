@@ -193,6 +193,7 @@ onAuthStateChanged(auth, usuario => {
     pintarAcessoPrivado();
     limparPedidosAntigos();
     escutarPedidos();
+    escutarPedidosDaMesa();
     lerEstadoLoja();
     carregarAjustesCardapio();
     carregarCaixa(hojeISO()).then(() => {
@@ -276,6 +277,38 @@ function escutarPedidos() {
     el("[data-lista]").innerHTML =
       `<p class="vazio">Perdi a conexão com o servidor de pedidos. Verifique a internet — assim que voltar, os pedidos aparecem sozinhos.</p>`;
   });
+}
+
+/* ========================= pedidos da mesa (restaurante.html) =========================
+   Cada rodada de pedido de uma mesa entra em "pedidos_mesa". Aqui a gente
+   escuta os que ainda estão "novo", manda pra comanda daquela mesa no
+   Balcão (balcao.js) e marca como "importado" pra não somar de novo. */
+let pararDeEscutarMesa = null;
+let primeiraCargaMesa = true;
+
+function escutarPedidosDaMesa() {
+  if (pararDeEscutarMesa) pararDeEscutarMesa();
+  primeiraCargaMesa = true;
+  const consulta = query(
+    collection(db, "pedidos_mesa"),
+    where("status", "==", "novo"),
+    orderBy("criadoEm", "asc")
+  );
+  pararDeEscutarMesa = onSnapshot(consulta, async instantaneo => {
+    const chegaram = [];
+    instantaneo.docChanges().forEach(m => {
+      if (m.type === "added") chegaram.push({ id: m.doc.id, ...m.doc.data() });
+    });
+    if (!chegaram.length) { primeiraCargaMesa = false; return; }
+    for (const p of chegaram) {
+      if (typeof window.rbImportarPedidoMesa === "function") {
+        window.rbImportarPedidoMesa(p.mesa, p.itens || [], p.cliente || "");
+      }
+      try { await updateDoc(doc(db, "pedidos_mesa", p.id), { status: "importado" }); } catch (e) {}
+    }
+    if (!primeiraCargaMesa) apitar();
+    primeiraCargaMesa = false;
+  }, erro => { console.error("pedidos_mesa:", erro); });
 }
 
 /* o número da comanda é a ordem de chegada no dia */
