@@ -209,21 +209,15 @@ const saboresDoGrupo = g => CARDAPIO.filter(i => i.g === g && i.pz && !i.off);
    assim (pedido do Matheus, 25/09/2026) */
 const todosSaboresPizza = () => CARDAPIO.filter(i => i.pz && !i.off);
 
-/* quando o item foi aberto a partir de uma das 4 categorias de pizza
-   (Grande/Broto Inteira/Meio a Meio), o tamanho já vem decidido lá de
-   trás, sem precisar escolher de novo dentro do modal */
-let modoPizzaPreset = null;
-
 function tamEscolhido() {
   if (itemAtual && ehCombo(itemAtual)) return itemAtual.pzcombo;
-  if (modoPizzaPreset) return modoPizzaPreset.tam;
   const r = $("[data-tam]:checked");
   return r ? r.value : (TAMANHOS[TAMANHOS.length - 1] || TAMANHOS[0]).id;
 }
 function bordaEscolhida() {
   const sel = $("[data-borda]");
   if (!sel) return null;
-  return BORDAS.find(b => b.n === sel.value) || null;
+  return BORDAS_SALGADA.concat(BORDAS_DOCE).find(b => b.n === sel.value) || null;
 }
 function nomeDoSabor(id) {
   const s = CARDAPIO.find(i => i.id === id);
@@ -247,26 +241,18 @@ try {
 } catch (e) { carrinho = []; }
 
 /* ========================= cardápio =========================
-   Pizza vem primeiro pelo TAMANHO e pelo TIPO DE MONTAGEM (Grande
-   Inteira, Grande Meio a Meio, Broto Inteira, Broto Meio a Meio),
-   escolhidos antes do sabor — assim o cliente já sabe o que está
-   escolhendo, em vez de decidir o tamanho só depois de abrir o
-   sabor. Dentro de cada um, os sabores vêm separados por Salgadas
-   e Doces, com foto e preço já daquele tamanho.
-   Pedido do Matheus em 25/09/2026, pra não ficar bagunçado com
-   quase 100 sabores todos misturados. */
-const MODOS_PIZZA = [
-  { id: "grande-inteira", tam: "grande", mm: false, titulo: "Pizza Grande Inteira",      rotulo: "Grande Inteira" },
-  { id: "grande-mm",      tam: "grande", mm: true,  titulo: "Pizza Grande Meio a Meio",  rotulo: "Grande Meio a Meio" },
-  { id: "broto-inteira",  tam: "broto",  mm: false, titulo: "Pizza Broto Inteira",       rotulo: "Broto Inteira" },
-  { id: "broto-mm",       tam: "broto",  mm: true,  titulo: "Pizza Broto Meio a Meio",   rotulo: "Broto Meio a Meio" }
-];
-const GRUPOS_FORA_DA_PIZZA = () => GRUPOS.filter(g => !["promocoes", "salgadas", "doces"].includes(g.id));
-
-function cartaoItem(i, tam, modoId) {
-  const preco = ehPizza(i) ? precoSabor(i, tam) : Number(i.p || 0);
+   Cardápio único, uma grade só de sabores (Salgadas e Doces como
+   filtro, igual às outras categorias). Tamanho (Broto/Grande) e
+   meio a meio são escolhidos dentro do próprio sabor, ao abrir o
+   card — é o padrão testado por cardápio digital de pizzaria
+   (iFood, Consumer, ClickPede etc.): uma grade só, sem multiplicar
+   a navegação por tamanho. Pesquisado e decidido em 25/09/2026. */
+function cartaoItem(i) {
+  const preco = ehPizza(i) && TAMANHOS.length > 1
+    ? `<small>a partir de</small> ${reais(precoDe(i))}`
+    : reais(i.p);
   return `
-    <button class="item" type="button" data-item="${i.id}" ${modoId ? `data-modo="${modoId}"` : ""}>
+    <button class="item" type="button" data-item="${i.id}">
       <span class="item-foto">
         <img src="${i.foto || `assets/img/fotos/${i.f}.jpg`}" alt="${i.n}" loading="lazy" decoding="async" width="560" height="420" />
         ${i.tag ? `<span class="etiqueta">${i.tag}</span>` : ""}
@@ -275,7 +261,7 @@ function cartaoItem(i, tam, modoId) {
         <span class="item-nome">${i.n}</span>
         ${i.d ? `<span class="item-desc">${i.d}</span>` : ""}
         <span class="item-rodape">
-          <span class="item-preco">${reais(preco)}</span>
+          <span class="item-preco">${preco}</span>
           <span class="item-mais" aria-hidden="true">+</span>
         </span>
       </span>
@@ -285,33 +271,13 @@ function cartaoItem(i, tam, modoId) {
 function montarCardapio() {
   const alvo = $("[data-cardapio]");
   const filtros = $("[data-filtros]");
-  const grupos = GRUPOS_FORA_DA_PIZZA();
+  const grupos = GRUPOS.filter(g => g.id !== "promocoes");
 
   filtros.innerHTML =
     `<button type="button" role="tab" aria-selected="true" data-f="todos">Tudo</button>` +
-    MODOS_PIZZA.map(m => `<button type="button" role="tab" aria-selected="false" data-f="${m.id}">${m.rotulo}</button>`).join("") +
     grupos.map(g => `<button type="button" role="tab" aria-selected="false" data-f="${g.id}">${g.rotulo}</button>`).join("");
 
-  const gruposPizza = MODOS_PIZZA.map(m => {
-    const salgadas = CARDAPIO.filter(i => i.g === "salgadas" && i.pz && !i.off);
-    const doces = CARDAPIO.filter(i => i.g === "doces" && i.pz && !i.off);
-    return `
-      <div class="grupo" data-grupo="${m.id}">
-        <div class="grupo-topo">
-          <h3>${m.titulo}</h3>
-          <span>${salgadas.length + doces.length} opções</span>
-        </div>
-        <p class="grupo-nota">${m.mm
-          ? "Meio a meio à vontade, inclusive misturando salgada com doce. Paga-se o valor do sabor mais caro" + (m.tam === "broto" ? " + R$ 1,00." : ".")
-          : "Um sabor só, do jeitinho que está no cardápio."}</p>
-        <h4 class="subgrupo-titulo">Salgadas</h4>
-        <div class="lista-itens">${salgadas.map(i => cartaoItem(i, m.tam, m.id)).join("")}</div>
-        <h4 class="subgrupo-titulo">Doces</h4>
-        <div class="lista-itens">${doces.map(i => cartaoItem(i, m.tam, m.id)).join("")}</div>
-      </div>`;
-  }).join("");
-
-  const gruposResto = grupos.map(g => {
+  alvo.innerHTML = grupos.map(g => {
     const itens = CARDAPIO.filter(i => i.g === g.id && !i.off);
     return `
       <div class="grupo" data-grupo="${g.id}">
@@ -320,11 +286,9 @@ function montarCardapio() {
           <span>${itens.length} ${itens.length === 1 ? "opção" : "opções"}</span>
         </div>
         ${g.nota ? `<p class="grupo-nota">${g.nota}</p>` : ""}
-        <div class="lista-itens">${itens.map(i => cartaoItem(i, null, null)).join("")}</div>
+        <div class="lista-itens">${itens.map(cartaoItem).join("")}</div>
       </div>`;
   }).join("");
-
-  alvo.innerHTML = gruposPizza + gruposResto;
 
   filtros.addEventListener("click", e => {
     const b = e.target.closest("button[data-f]");
@@ -336,9 +300,7 @@ function montarCardapio() {
 
   alvo.addEventListener("click", e => {
     const b = e.target.closest("[data-item]");
-    if (!b) return;
-    const modo = b.dataset.modo ? MODOS_PIZZA.find(m => m.id === b.dataset.modo) : null;
-    abrirModal(b.dataset.item, modo ? { tam: modo.tam, mm: modo.mm } : null);
+    if (b) abrirModal(b.dataset.item);
   });
 }
 
@@ -365,8 +327,7 @@ function blocoTamanhos(it) {
 
 function blocoSabores(it) {
   const t = TAM(tamEscolhido());
-  const soUmSabor = t.sabores < 2 || (modoPizzaPreset && !modoPizzaPreset.mm);
-  if (soUmSabor) {
+  if (t.sabores < 2) {
     return `<div class="extras-bloco">
       <p class="extras-titulo">Sabor</p>
       <p class="extras-ajuda">Pizza ${t.n} inteira, 1 sabor só: <b>${it.n}</b>.</p>
@@ -410,24 +371,14 @@ function blocoComboSabores(it) {
   return h;
 }
 
-function blocoMassa() {
-  return `<div class="extras-bloco">
-    <p class="extras-titulo">Massa</p>
-    <div class="opcoes-linha">
-      ${MASSAS.map((m, k) => `
-        <label class="opc">
-          <input type="radio" name="massa" data-massa value="${m}" ${k === 0 ? "checked" : ""} />
-          <span>${m}</span>
-        </label>`).join("")}
-    </div>
-  </div>`;
-}
-
-function blocoBorda() {
+/* borda doce (chocolate etc.) só faz sentido em pizza doce; a pizza
+   salgada oferece a recheada de catupiry original */
+function blocoBorda(it) {
+  const lista = it && it.g === "doces" ? BORDAS_DOCE : BORDAS_SALGADA;
   return `<div class="extras-bloco">
     <label class="escolha">Borda recheada <small>(opcional)</small>
       <select data-borda>
-        ${BORDAS.map(b => `<option value="${b.n}">${b.n}${b.p ? ` — + ${reais(b.p)}` : ""}</option>`).join("")}
+        ${lista.map(b => `<option value="${b.n}">${b.n}${b.p ? ` — + ${reais(b.p)}` : ""}</option>`).join("")}
       </select>
     </label>
   </div>`;
@@ -436,18 +387,15 @@ function blocoBorda() {
 /* ========================= modal do item ========================= */
 let itemAtual = null, qtdAtual = 1;
 
-function abrirModal(id, modo) {
+function abrirModal(id) {
   const it = CARDAPIO.find(i => i.id === id);
   if (!it) return;
   itemAtual = it; qtdAtual = 1;
-  modoPizzaPreset = modo || null;
 
   const mf = $("[data-modal-foto]");
   mf.src = it.foto || `assets/img/fotos/${it.f}.jpg`;
   mf.alt = it.n;
-  $("[data-modal-cat]").textContent = modoPizzaPreset
-    ? MODOS_PIZZA.find(m => m.tam === modoPizzaPreset.tam && m.mm === modoPizzaPreset.mm).titulo
-    : GRUPOS.find(g => g.id === it.g).titulo;
+  $("[data-modal-cat]").textContent = GRUPOS.find(g => g.id === it.g).titulo;
   $("[data-modal-nome]").textContent = it.n;
   const desc = $("[data-modal-desc]");
   desc.textContent = it.d || "";
@@ -459,18 +407,13 @@ function abrirModal(id, modo) {
   let html = "";
 
   if (ehPizza(it)) {
-    /* pizzaria de tamanho único não precisa de escolha de tamanho, e
-       quando veio de uma das 4 categorias o tamanho já foi escolhido
-       antes de abrir o sabor */
-    if (TAMANHOS.length > 1 && !modoPizzaPreset) html += blocoTamanhos(it);
+    if (TAMANHOS.length > 1) html += blocoTamanhos(it);
     html += `<div data-sabores></div>`;
-    html += blocoMassa();
-    html += blocoBorda();
+    html += blocoBorda(it);
   }
   if (ehCombo(it)) {
     html += blocoComboSabores(it);
-    html += blocoMassa();
-    html += blocoBorda();
+    html += blocoBorda(it);
   }
   if (it.escolhas) {
     html += `<div class="extras-bloco">
@@ -549,7 +492,6 @@ function atualizarModal() {
 function fecharModal() {
   $("[data-modal]").hidden = true;
   itemAtual = null;
-  modoPizzaPreset = null;
   if (!$("[data-carrinho]").dataset.aberto) document.body.classList.remove("travado");
 }
 
