@@ -26,7 +26,18 @@ const provider = new GoogleAuthProvider();
 
 async function entrar() {
   try { await signInWithPopup(auth, provider); }
-  catch (e) { alert("Não consegui entrar com o Google agora. Tente de novo."); }
+  catch (e) {
+    console.error("login Google:", e && e.code, e && e.message);
+    if (e && e.code === "auth/popup-blocked") {
+      alert("O navegador bloqueou a janela de login. Permita pop-ups pra esse site e tente de novo.");
+    } else if (e && e.code === "auth/cancelled-popup-request") {
+      // usuário clicou duas vezes rápido, ou fechou a janela: não precisa avisar
+    } else if (e && e.code === "auth/popup-closed-by-user") {
+      // fechou a janela sem terminar: silencioso, não é erro
+    } else {
+      alert("Não consegui entrar com o Google agora (" + (e && e.code || "erro desconhecido") + "). Tente de novo.");
+    }
+  }
 }
 function sair() { signOut(auth); }
 
