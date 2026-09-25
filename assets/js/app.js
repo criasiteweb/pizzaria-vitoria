@@ -1217,12 +1217,19 @@ function lojaAbertaAgora() {
   };
 }
 
+/* transforma 17.5 em "17h30", 23.6667 em "23h40" */
+function horaFormatada(h) {
+  const hi = Math.floor(h);
+  const min = Math.round((h - hi) * 60);
+  return min ? `${hi}h${String(min).padStart(2, "0")}` : `${hi}h`;
+}
+
 /* por que não dá para pedir agora, em uma frase curta e sem travessão */
 function motivoFechado() {
   const e = lojaAbertaAgora();
   if (e.naMao) return "A loja está fechada no momento. Volte mais tarde.";
-  if (e.fechadoHoje) return "Hoje a loja não abre. Voltamos terça às 18h.";
-  return `Estamos fechados agora. Abrimos às ${LOJA.abre}h.`;
+  if (e.fechadoHoje) return `Hoje a loja não abre. Voltamos às ${horaFormatada(LOJA.abre)}.`;
+  return `Estamos fechados agora. Abrimos às ${horaFormatada(LOJA.abre)}.`;
 }
 
 /* liga e desliga o botão de enviar conforme a loja */
@@ -1249,8 +1256,8 @@ function statusLoja() {
   txt.textContent = aberto
     ? "Aberto agora"
     : lojaNoManual === false ? "Fechado no momento"
-    : fechadoHoje ? "Fechado hoje. Abre terça às 18h"
-    : `Fechado. Abre às ${LOJA.abre}h`;
+    : fechadoHoje ? `Fechado hoje. Abre às ${horaFormatada(LOJA.abre)}`
+    : `Fechado. Abre às ${horaFormatada(LOJA.abre)}`;
 }
 
 /* ---- ajustes do cardápio feitos pelo dono no painel ----
