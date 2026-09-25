@@ -183,6 +183,9 @@ em{font-style:normal;color:var(--amarelo)}
 .grupo-topo h3{font-size:clamp(1.25rem,5vw,1.7rem);color:var(--creme)}
 .grupo-topo span{font-size:.72rem;color:var(--texto-suave);letter-spacing:.06em;text-transform:uppercase;margin-left:auto;white-space:nowrap}
 .grupo-nota{font-size:.8rem;color:var(--texto-suave);margin:-.4rem 0 1rem}
+.subgrupo-titulo{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:800;
+  color:var(--amarelo);margin:1.1rem 0 .6rem}
+.subgrupo-titulo:first-of-type{margin-top:0}
 .lista-itens{display:grid;gap:.7rem;grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(min-width:680px){.lista-itens{grid-template-columns:repeat(3,minmax(0,1fr));gap:.9rem}}
 @media(min-width:980px){.lista-itens{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -591,6 +594,12 @@ em{font-style:normal;color:var(--amarelo)}
 /* =========================================================
    CUPOM DE DESCONTO
    ========================================================= */
+.login-google{margin-bottom:.9rem}
+.login-google .botao{width:100%;font-size:.82rem;padding:.7rem 1rem}
+.login-google.conta{display:flex;align-items:center;justify-content:space-between;gap:.6rem;
+  background:var(--giz);border:1px solid var(--linha);border-radius:12px;padding:.6rem .8rem;font-size:.82rem}
+.login-google.conta button{background:transparent;border:1px solid var(--linha);color:var(--texto-suave);
+  border-radius:999px;padding:.35rem .75rem;font-size:.76rem;cursor:pointer;font-family:inherit}
 .cupom{margin-bottom:.7rem}
 .cupom-linha{display:flex;gap:.5rem}
 .cupom-linha input{flex:1;min-width:0;background:var(--giz);border:1px solid var(--linha);border-radius:10px;
