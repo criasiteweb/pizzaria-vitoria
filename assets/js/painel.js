@@ -16,7 +16,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 import {
   getFirestore, collection, query, where, orderBy, onSnapshot, getDocs,
-  doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp
+  doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, limit
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 import { FIREBASE_CONFIG, CONTA_LOJA } from "./firebase-config.js";
@@ -189,6 +189,9 @@ onAuthStateChanged(auth, usuario => {
   if (usuario) {
     mostrarLogin(false);
     el("[data-senha]").value = "";
+    acessoPrivadoLiberado = false;
+    pintarAcessoPrivado();
+    limparPedidosAntigos();
     escutarPedidos();
     lerEstadoLoja();
     carregarAjustesCardapio();
@@ -473,7 +476,17 @@ setInterval(() => { if (pedidos.length && !el("[data-tela-painel]").hidden) dese
 let caixaDoDia = { despesas: [], fechado: false };
 let diaDoCaixa = null;
 
-function hojeISO() { return new Date().toISOString().slice(0, 10); }
+/* Data no fuso do aparelho (Brasília). NUNCA usar toISOString() para isto:
+   ela devolve a data de Londres, e das 21h à meia-noite — o pico da loja —
+   já é o dia seguinte lá. Isso fazia venda da noite cair no relatório do dia
+   seguinte e a comanda zerar a numeração às 21h. */
+function diaISO(data) {
+  const d = data || new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+    "-" + String(d.getDate()).padStart(2, "0");
+}
+
+function hojeISO() { return diaISO(); }
 
 function diaAtual() { return filtro === "historico" && dataHistorico ? dataHistorico : hojeISO(); }
 
@@ -635,7 +648,7 @@ async function relatorioMes(iso) {
     const porDia = {};
     todos.forEach(p => {
       const dia = p.criadoEm && p.criadoEm.toDate
-        ? p.criadoEm.toDate().toISOString().slice(0, 10) : "?";
+        ? diaISO(p.criadoEm.toDate()) : "?";
       (porDia[dia] = porDia[dia] || []).push(p);
     });
 
@@ -973,7 +986,7 @@ els("[data-filtro]").forEach(b => b.addEventListener("click", () => {
 
 function ontemISO() {
   const d = new Date(); d.setDate(d.getDate() - 1);
-  return d.toISOString().slice(0, 10);
+  return diaISO(d);
 }
 
 el("[data-data]").addEventListener("change", async e => {
@@ -986,7 +999,7 @@ el("[data-data]").addEventListener("change", async e => {
     return;
   }
   dataHistorico = e.target.value;
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = hojeISO();
   if (!dataHistorico || dataHistorico === hoje) {
     filtro = "todos"; dataHistorico = null; escutarPedidos(); desenhar();
   } else {
@@ -1086,16 +1099,31 @@ el("[data-ed-salvar]").addEventListener("click", async () => {
 
 /* ========================= abrir e fechar a loja =========================
    O selo do site do cliente segue o horário; este botão manda nele.
-   Serve para fechar antes da hora (acabou o pão) ou abrir fora do horário. */
+   Serve para fechar antes da hora (acabou o gás) ou abrir fora do horário
+   (ex.: movimento forte e quer abrir mais cedo). */
 let lojaAberta = null;   // null = seguir o horário
+
+/* mesmo horário do site do cliente: 17h30 às 23h40, todos os dias */
+const HORARIO = { abre: 17.5, fecha: 23.6667, diasFechados: [] };
+
+function dentroDoHorario() {
+  const a = new Date();
+  const h = a.getHours() + a.getMinutes() / 60;
+  return !HORARIO.diasFechados.includes(a.getDay()) && h >= HORARIO.abre && h < HORARIO.fecha;
+}
+
+/* o site está aceitando pedido neste instante? o botão manda; sem ele, o horário */
+function siteAceitandoPedido() {
+  return lojaAberta === null ? dentroDoHorario() : lojaAberta;
+}
 
 function pintarLoja() {
   const b = el("[data-loja-estado]");
   if (!b) return;
-  const fechada = lojaAberta === false;
-  b.textContent = fechada ? "Loja fechada" : "Loja aberta";
-  b.setAttribute("aria-pressed", String(!fechada));
-  b.dataset.fechada = String(fechada);
+  const aberta = siteAceitandoPedido();
+  b.textContent = aberta ? "Loja aberta" : "Loja fechada";
+  b.setAttribute("aria-pressed", String(aberta));
+  b.dataset.fechada = String(!aberta);
 }
 
 async function lerEstadoLoja() {
@@ -1109,38 +1137,30 @@ async function lerEstadoLoja() {
   pintarLoja();
 }
 
-/* Dois estados, de propósito:
-   "No horário normal" = o site abre e fecha sozinho, das 18h à meia-noite.
-   "Fechada agora"     = fecha antes da hora (acabou o pão, faltou gás).
+/* O botão faz o contrário do que o site está fazendo agora:
+   site aceitando pedido  -> fecha a loja na hora (acabou o gás, muito movimento)
+   site recusando pedido  -> abre a loja na hora, mesmo fora do horário
 
-   O botão NUNCA força a loja a ficar aberta fora do horário: se alguém
-   esquecesse ligado, o site aceitaria pedido às 3h da manhã. Para mudar o
-   horário de funcionamento, fale com a Criasiteweb. */
+   O ajuste vale só para o dia de hoje: virou o dia, a loja volta a seguir o
+   horário sozinha, para ninguém esquecer o site aberto de madrugada. */
 el("[data-loja-estado]").addEventListener("click", async () => {
-  const fechando = lojaAberta !== false;
+  const fechando = siteAceitandoPedido();
   const aviso = fechando
     ? "Fechar a loja agora?\n\nO site vai mostrar FECHADO e não deixa o cliente enviar pedido, mesmo dentro do horário."
-    : "Voltar ao horário normal?\n\nO site volta a abrir e fechar sozinho, das 18h à meia-noite, de terça a domingo.";
+    : dentroDoHorario()
+      ? "Reabrir a loja?\n\nO site volta a mostrar ABERTO e a aceitar pedidos."
+      : "Abrir a loja agora, fora do horário?\n\nO site vai mostrar ABERTO e aceitar pedido até o fim do dia de hoje. Amanhã volta sozinho ao horário normal.";
   if (!confirm(aviso)) return;
 
   const antes = lojaAberta;
-  lojaAberta = fechando ? false : null;
+  lojaAberta = !fechando;
   pintarLoja();
   try {
-    if (fechando) {
-      await setDoc(doc(db, "publico", "loja"), {
-        aberta: false,
-        dia: hojeISO(),             // o fechamento vale só hoje
-        mudadoEm: Timestamp.now()
-      });
-    } else {
-      /* volta ao automático: sem dia válido, o site segue o horário */
-      await setDoc(doc(db, "publico", "loja"), {
-        aberta: true,
-        dia: "",
-        mudadoEm: Timestamp.now()
-      });
-    }
+    await setDoc(doc(db, "publico", "loja"), {
+      aberta: !fechando,
+      dia: hojeISO(),
+      mudadoEm: Timestamp.now()
+    });
   } catch (e) {
     lojaAberta = antes; pintarLoja();
     alert("Não consegui salvar. Verifique a internet e tente de novo.");
@@ -1163,6 +1183,25 @@ el("[data-atualizar]").addEventListener("click", async () => {
   u.searchParams.set("atualizado", String(Date.now()));
   location.replace(u.toString());
 });
+
+/* ========================= limpeza automática de 6 meses =========================
+   Só a coleção "pedidos" (nome, telefone, endereço do cliente) é limpa.
+   O "caixa" (faturamento, resumo do dia) é gravado à parte e fica para
+   sempre, então não é afetado por esta limpeza. Roda uma vez por sessão,
+   quando o painel abre, em lotes de até 300 por vez para não pesar. */
+async function limparPedidosAntigos() {
+  try {
+    const seisMesesAtras = new Date();
+    seisMesesAtras.setMonth(seisMesesAtras.getMonth() - 6);
+    const r = await getDocs(query(
+      collection(db, "pedidos"),
+      where("criadoEm", "<", Timestamp.fromDate(seisMesesAtras)),
+      limit(300)
+    ));
+    if (r.empty) return;
+    await Promise.all(r.docs.map(d => deleteDoc(d.ref)));
+  } catch (e) { /* sem internet ou sem permissão: tenta de novo na próxima abertura */ }
+}
 
 /* ========================= trocar a senha da loja ========================= */
 el("[data-trocar-senha]").addEventListener("click", async () => {
@@ -1197,6 +1236,89 @@ el("[data-trocar-senha]").addEventListener("click", async () => {
       alert("Sem internet. Tente de novo quando a conexão voltar.");
     else
       alert("Não consegui trocar a senha agora. Tente de novo em instantes.");
+  }
+});
+
+/* ========================= acesso privado (Caixa, Histórico, Cardápio) =========================
+   Segunda senha, separada da senha do painel. Funcionário sem ela continua
+   vendo Em aberto e Balcão, mas não abre faturamento, histórico de clientes
+   nem edição de cardápio. Guardada no servidor, em config/painel, que só a
+   conta da loja consegue ler (ver firestore.rules). */
+let acessoPrivadoLiberado = false;
+
+function pintarAcessoPrivado() {
+  const b = el("[data-acesso-privado]");
+  const bs = el("[data-trocar-senha-privada]");
+  if (b) b.textContent = acessoPrivadoLiberado ? "Acesso privado (aberto)" : "Acesso privado";
+  if (bs) bs.hidden = !acessoPrivadoLiberado;
+  els("[data-so-privado]").forEach(btn => { btn.hidden = !acessoPrivadoLiberado; });
+  if (!acessoPrivadoLiberado && ["caixa", "historico", "cardapio"].includes(filtro)) {
+    filtro = "abertos"; dataHistorico = null; escutarPedidos(); desenhar();
+  }
+}
+
+async function lerSenhaPrivada() {
+  const d = await getDoc(doc(db, "config", "painel"));
+  return d.exists() ? d.data().senha : null;
+}
+
+el("[data-acesso-privado]").addEventListener("click", async () => {
+  if (acessoPrivadoLiberado) {
+    if (!confirm("Trancar o acesso privado de novo?")) return;
+    acessoPrivadoLiberado = false;
+    pintarAcessoPrivado();
+    return;
+  }
+  let senhaGuardada;
+  try {
+    senhaGuardada = await lerSenhaPrivada();
+  } catch (e) {
+    return alert("Não consegui checar a senha agora. Verifique a internet e tente de novo.");
+  }
+  if (!senhaGuardada) {
+    if (!confirm("Ainda não existe uma senha para o acesso privado. Criar uma agora?")) return;
+    const nova = prompt("Digite a nova senha do acesso privado (pelo menos 6 letras ou números):");
+    if (nova === null) return;
+    if (nova.trim().length < 6) return alert("A senha precisa ter pelo menos 6 letras ou números.");
+    try {
+      await setDoc(doc(db, "config", "painel"), { senha: nova.trim() });
+    } catch (e) {
+      return alert("Não consegui salvar a senha agora. Tente de novo.");
+    }
+    acessoPrivadoLiberado = true;
+    pintarAcessoPrivado();
+    return;
+  }
+  const tentativa = prompt("Senha do acesso privado:");
+  if (tentativa === null) return;
+  if (tentativa !== senhaGuardada) return alert("Senha errada.");
+  acessoPrivadoLiberado = true;
+  pintarAcessoPrivado();
+});
+
+el("[data-trocar-senha-privada]").addEventListener("click", async () => {
+  if (!acessoPrivadoLiberado) return;
+  let senhaGuardada;
+  try { senhaGuardada = await lerSenhaPrivada(); } catch (e) {
+    return alert("Não consegui checar a senha agora. Verifique a internet e tente de novo.");
+  }
+  const atual = prompt("Digite a senha privada de hoje:");
+  if (atual === null) return;
+  if (atual !== senhaGuardada) return alert("A senha de hoje está errada. Nada foi alterado.");
+
+  const nova = prompt("Digite a NOVA senha do acesso privado (pelo menos 6 letras ou números):");
+  if (nova === null) return;
+  if (nova.trim().length < 6) return alert("A nova senha precisa ter pelo menos 6 letras ou números.");
+
+  const confere = prompt("Digite a nova senha de novo para conferir:");
+  if (confere === null) return;
+  if (confere !== nova) return alert("As duas não bateram. Nada foi alterado.");
+
+  try {
+    await setDoc(doc(db, "config", "painel"), { senha: nova.trim() });
+    alert("Pronto! A senha do acesso privado foi trocada.");
+  } catch (e) {
+    alert("Não consegui salvar agora. Tente de novo.");
   }
 });
 
