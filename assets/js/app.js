@@ -26,7 +26,7 @@ const LOJA = {
      ======================================================= */
   entrega: {
     ativa: true,
-    raioKm: 10,
+    raioKm: 17,
     /* Tabela real de bairros e taxa, passada pelo Matheus em 25/09/2026,
        82 bairros no total. */
     cidades: {
@@ -113,21 +113,27 @@ const LOJA = {
         "Vila Gomes": 12.00,
         "Vila Verde": 10.00,
         "Vila Belmiro": 12.00
-      }
+      },
+      /* Suzano confirmado pelo dono em 25/09/2026: também entregam lá,
+         sem tabela fixa de bairro (a taxa vem do cálculo por distância
+         logo abaixo). Precisa existir aqui pra aparecer no seletor de
+         cidade e pro CEP de Suzano preencher a rua sozinho. */
+      "Suzano": {}
     },
 
     /* =====================================================
        TAXA AUTOMÁTICA POR DISTÂNCIA
-       Desligada: a tabela real de 82 bairros já cobre a área
-       de entrega da loja. Bairro fora da lista cai no aviso
-       "Não encontrou seu bairro? Fale conosco pelo WhatsApp".
+       Ligada com raio de 17 km (confirmado pelo dono em
+       25/09/2026, cobre Suzano). Serve pra qualquer bairro fora
+       da tabela de 82 acima — Suzano inteiro cai aqui, já que
+       não tem tabela fixa por bairro de lá ainda.
        ===================================================== */
     porDistancia: {
-      ativa: false,
+      ativa: true,
       base: 3,
       ateKm: 2,
       porKm: 1,
-      maxKm: 10,
+      maxKm: 17,
       fator: 1.3
     },
 
@@ -423,12 +429,33 @@ function abrirModal(id) {
 
   if (ehPizza(it)) {
     if (TAMANHOS.length > 1) html += blocoTamanhos(it);
-    html += `<div data-sabores></div>`;
+    if (it.escolherIngredientes) {
+      html += `<div class="extras-bloco">
+        <p class="extras-titulo">Escolha ${it.escolherIngredientes} ingredientes</p>
+        <p class="extras-ajuda" data-freg-contador>Marque exatamente ${it.escolherIngredientes}.</p>
+        <div class="extras-lista">
+          ${INGREDIENTES_FREGUES.map(i => `
+            <label class="extra">
+              <input type="checkbox" data-ingrediente value="${i}" />
+              <span>${i}</span>
+            </label>`).join("")}
+        </div>
+      </div>`;
+    } else {
+      html += `<div data-sabores></div>`;
+    }
     html += blocoBorda(it);
   }
   if (ehCombo(it)) {
     html += blocoComboSabores(it);
     html += blocoBorda(it);
+  }
+  if (it.opcoes) {
+    html += `<div class="extras-bloco">
+      <label class="escolha">Escolha
+        <select data-opcao required>${it.opcoes.map(o => `<option>${o}</option>`).join("")}</select>
+      </label>
+    </div>`;
   }
   if (it.escolhas) {
     html += `<div class="extras-bloco">
@@ -501,6 +528,14 @@ function atualizarModal() {
       });
     }
   }
+  if (itemAtual && itemAtual.escolherIngredientes) {
+    const max = itemAtual.escolherIngredientes;
+    const marcados = $$("[data-ingrediente]:checked");
+    $$("[data-ingrediente]").forEach(c => { c.disabled = !c.checked && marcados.length >= max; });
+    const contador = $("[data-freg-contador]");
+    if (contador) contador.textContent = `${marcados.length} de ${max} marcados.`;
+  }
+
   $("[data-modal-total]").textContent = reais(precoModal());
   $("[data-modal-qtd]").textContent = String(qtdAtual);
 }
@@ -649,16 +684,31 @@ function esvaziarDepoisDoEnvio() {
 
 function adicionarDoModal() {
   if (!itemAtual) return;
+
+  if (itemAtual.escolherIngredientes) {
+    const marcados = $$("[data-ingrediente]:checked");
+    if (marcados.length !== itemAtual.escolherIngredientes) {
+      alert(`Marque exatamente ${itemAtual.escolherIngredientes} ingredientes (você marcou ${marcados.length}).`);
+      return;
+    }
+  }
+
   const adds = $$("[data-add]:checked").map(c => ({ n: c.value, p: Number(c.dataset.preco) }));
   const escolhas = [];
   let nome = itemAtual.n;
 
   if (ehPizza(itemAtual)) {
     const t = TAM(tamEscolhido());
-    const ids = [itemAtual.id];
-    $$("[data-sabor]").forEach(s => { if (s.value && !ids.includes(s.value)) ids.push(s.value); });
-    nome = `Pizza ${t.n} · ${ids.map(nomeDoSabor).join(" / ")}`;
-    if (ids.length > 1) escolhas.push(`${ids.length} sabores`);
+    if (itemAtual.escolherIngredientes) {
+      const ingredientes = $$("[data-ingrediente]:checked").map(c => c.value);
+      nome = `Pizza ${t.n} · ${itemAtual.n.replace(/^\d+\s*·\s*/, "")}`;
+      escolhas.push(ingredientes.join(", "));
+    } else {
+      const ids = [itemAtual.id];
+      $$("[data-sabor]").forEach(s => { if (s.value && !ids.includes(s.value)) ids.push(s.value); });
+      nome = `Pizza ${t.n} · ${ids.map(nomeDoSabor).join(" / ")}`;
+      if (ids.length > 1) escolhas.push(`${ids.length} sabores`);
+    }
   } else if (ehCombo(itemAtual)) {
     const t = TAM(itemAtual.pzcombo);
     const porPizza = {};
@@ -673,6 +723,8 @@ function adicionarDoModal() {
       escolhas.push(`${itemAtual.combo2 ? `${Number(n) + 1}ª pizza ${t.n}` : `Pizza ${t.n}`}: ${nomes}`);
     });
   } else {
+    const opcao = $("[data-opcao]");
+    if (opcao) nome = `${itemAtual.n} · ${opcao.value}`;
     $$("[data-escolha]").forEach(s => escolhas.push(s.value));
   }
 
@@ -857,23 +909,24 @@ async function buscarCep() {
     const e = await r.json();
     if (e.erro) { avisoCep("CEP não encontrado — preencha os campos abaixo.", false); return; }
 
-    /* a loja atende essa cidade? */
+    /* a rua sempre preenche, atende a cidade ou não — só o cálculo da
+       taxa que depende disso. Bug antigo: travava tudo (nem a rua saía)
+       quando a cidade do CEP não batia com a tabela. */
     const cidades = Object.keys(LOJA.entrega.cidades);
     const cidade = cidades.find(c => c.toLowerCase() === String(e.localidade).toLowerCase());
-    if (!cidade) {
-      avisoCep(`A loja entrega em ${cidades.join(", ")}. O CEP informado é de ${e.localidade}.`, false);
-      return;
-    }
-
-    $("[data-cidade]").value = cidade;
-    preencherBairros();
 
     const rua = document.querySelector("[name=endereco]");
-    if (e.logradouro) { rua.value = e.logradouro; ultimaBusca = cidade + "|" + e.logradouro.toLowerCase(); }
-    if (e.bairro) aplicarBairro(e.bairro);
+    if (e.logradouro) { rua.value = e.logradouro; ultimaBusca = (cidade || e.localidade) + "|" + e.logradouro.toLowerCase(); }
 
-    avisoCep(`${e.logradouro || "Endereço"} — ${e.bairro || ""}, ${e.localidade}`.replace(" — ,", " —"), true);
-    pedirDistancia();          // já calcula a taxa com o endereço que veio do CEP
+    if (cidade) {
+      $("[data-cidade]").value = cidade;
+      preencherBairros();
+      if (e.bairro) aplicarBairro(e.bairro);
+      avisoCep(`${e.logradouro || "Endereço"} — ${e.bairro || ""}, ${e.localidade}`.replace(" — ,", " —"), true);
+      pedirDistancia();        // já calcula a taxa com o endereço que veio do CEP
+    } else {
+      avisoCep(`Endereço preenchido, mas confirme se entregamos em ${e.localidade} pelo WhatsApp.`, false);
+    }
     if (e.logradouro) document.querySelector("[name=numero]").focus();
   } catch (err) {
     avisoCep("", false);   // sem internet: o cliente preenche na mão
