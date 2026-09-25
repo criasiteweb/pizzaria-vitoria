@@ -80,6 +80,19 @@
     <div><b>Meio a meio</b><small>vale o valor da mais cara</small></div>
   </section>
 
+  <section id="combos" class="secao promo" data-surge>
+    <div class="promo-topo">
+      <p class="promo-tarja">🔥 Promoção da casa</p>
+      <h2>Promoções do dia</h2>
+      <p class="promo-apoio">
+        Pizza grande por <b>R$ 55,00</b> em seis sabores escolhidos, e <b>você monta meio a meio</b> entre eles.
+        A partir de <b data-combo-apartir>R$ 55,00</b>.
+      </p>
+    </div>
+    <div class="promo-vitrine" data-vitrine-combos></div>
+    <p class="promo-rodape">Promoção por tempo indeterminado, conforme o folheto da casa.</p>
+  </section>
+
   <section id="cardapio" class="secao">
     <div class="titulo-secao" data-surge>
       <p class="chamada">Nosso cardápio</p>
@@ -89,19 +102,6 @@
 
     <div class="filtros" role="tablist" aria-label="Filtrar cardápio" data-filtros></div>
     <div class="cardapio" data-cardapio></div>
-  </section>
-
-  <section id="combos" class="secao promo" data-surge>
-    <div class="promo-topo">
-      <p class="promo-tarja">🔥 Promoção da casa</p>
-      <h2>Promoções do dia</h2>
-      <p class="promo-apoio">
-        Pizza grande por <b>R$ 50,00</b> em seis sabores escolhidos, e <b>você monta meio a meio</b> entre eles.
-        A partir de <b data-combo-apartir>R$ 50,00</b>.
-      </p>
-    </div>
-    <div class="promo-vitrine" data-vitrine-combos></div>
-    <p class="promo-rodape">Promoção por tempo indeterminado, conforme o folheto da casa.</p>
   </section>
 
   <section class="secao avaliacoes" aria-labelledby="t-aval">
@@ -212,6 +212,13 @@
     <div class="carrinho-corpo">
       <div class="carrinho-itens" data-itens></div>
       <div class="checkout-campos">
+        <div class="login-google" data-login-google>
+          <button type="button" class="botao contorno" data-entrar-google>Entrar com Google (opcional) — preenche seus dados sozinho</button>
+        </div>
+        <div class="login-google conta" data-conta-google hidden>
+          <span>Olá, <b data-conta-nome></b>. Seus dados vêm preenchidos.</span>
+          <button type="button" data-sair-google>Sair</button>
+        </div>
         <label>Seu nome
           <input name="nome" type="text" placeholder="Como te chamamos?" autocomplete="name" />
         </label>
@@ -327,5 +334,6 @@
   document.write('<script src="assets/js/app.js?t=' + t + '"><\/script>'); })();
 </script>
 <script type="module" src="assets/js/envio.js?v=21"></script>
+<script type="module" src="assets/js/cliente-login.js?v=1"></script>
 </body>
 </html>
