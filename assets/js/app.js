@@ -143,6 +143,15 @@ const LOJA = {
   linkComanda: false
 };
 
+/* =========================================================
+   MODO MESA (página restaurante.html)
+   Quando o endereço vem com ?mesa=7, o site vira o cardápio
+   de dentro do restaurante: só "No restaurante", sem endereço
+   nem forma de pagamento, e o pedido cai direto na comanda
+   daquela mesa no painel. É o mesmo app.js do site normal,
+   este parâmetro nunca aparece em index.html. */
+const MESA_ATUAL = new URLSearchParams(location.search).get("mesa");
+
 /* transforma texto em código para caber no link da comanda */
 /* =========================================================
    PROJETO NO SERVIDOR (Firebase)
@@ -1090,14 +1099,19 @@ function enviarPedido(e) {
   $$("input,select", f).forEach(c => c.removeAttribute("aria-invalid"));
 
   if (!carrinho.length) return erro(null, "Adicione pelo menos um item do cardápio.");
-  if (!f.nome.value.trim()) return erro(f.nome, "Diga seu nome para a gente te chamar.");
-  if (soDigitos(f.fone.value).length < 10) return erro(f.fone, "Confira o número do WhatsApp com DDD.");
-
-  const modo = f.tipo.value;
   if (!lojaAbertaAgora().aberto) {
     travarEnvio();
     return avisoStatus(motivoFechado());
   }
+
+  /* ---- modo mesa: sem WhatsApp, sem endereço, sem pagamento ----
+     manda pra fila da mesa (pedidos_mesa) e a comanda soma no painel */
+  if (MESA_ATUAL) return enviarPedidoDaMesa(f, st);
+
+  if (!f.nome.value.trim()) return erro(f.nome, "Diga seu nome para a gente te chamar.");
+  if (soDigitos(f.fone.value).length < 10) return erro(f.fone, "Confira o número do WhatsApp com DDD.");
+
+  const modo = f.tipo.value;
   const tipo = modo;
   if (tipo === "Entrega") {
     if (!f.endereco.value.trim()) return erro(f.endereco, "Diga o nome da rua para entregarmos.");
@@ -1174,7 +1188,53 @@ function enviarPedido(e) {
   esvaziarDepoisDoEnvio();
 }
 
-function mostrarConfirmacao(nome) {
+/* pedido da mesa: sem pagamento aqui, a conta é fechada no restaurante
+   pelo Balcão do painel, que já soma tudo o que a mesa pediu */
+function enviarPedidoDaMesa(f, st) {
+  const itens = carrinho.map(l => ({
+    nome: l.n,
+    qtd: l.q,
+    preco: l.unit,
+    escolhas: l.escolhas || [],
+    adds: (l.adds || []).map(a => a.n),
+    obs: l.obs || ""
+  }));
+
+  if (!window.enviarPedidoMesa) return avisoStatus("Não consegui enviar agora. Chame o garçom.");
+
+  st.dataset.erro = "false";
+  st.textContent = "Enviando para a cozinha…";
+
+  window.enviarPedidoMesa({
+    mesa: Number(MESA_ATUAL),
+    cliente: (f.nome ? f.nome.value.trim() : "") || "",
+    itens,
+    total: totalDoPedido()
+  }).then(ok => {
+    if (!ok) return avisoStatus("Não consegui enviar agora. Chame o garçom.");
+    mostrarConfirmacao(f.nome ? f.nome.value.trim() : "", true);
+    esvaziarDepoisDoEnvio();
+  });
+}
+
+function mostrarConfirmacao(nome, modoMesa) {
+  if (modoMesa) {
+    const caixa = document.createElement("div");
+    caixa.className = "confirmado";
+    caixa.innerHTML = `
+      <div class="confirmado-cartao" role="dialog" aria-live="polite">
+        <div class="confirmado-selo">✓</div>
+        <h3>Pedido enviado${nome ? ", " + nome.split(" ")[0] : ""}!</h3>
+        <p>Já chegou na cozinha, mesa <strong>${MESA_ATUAL}</strong>. Você pode continuar
+           pedindo quantas vezes quiser — a conta fecha só no final, com o garçom.</p>
+        <button type="button" class="confirmado-fechar">Fechar</button>
+      </div>`;
+    document.body.appendChild(caixa);
+    const sair = () => caixa.remove();
+    caixa.querySelector(".confirmado-fechar").addEventListener("click", sair);
+    caixa.addEventListener("click", e => { if (e.target === caixa) sair(); });
+    return;
+  }
   const caixa = document.createElement("div");
   caixa.className = "confirmado";
   caixa.innerHTML = `
@@ -1239,7 +1299,7 @@ function travarEnvio() {
   const { aberto } = lojaAbertaAgora();
   botao.disabled = !aberto;
   botao.dataset.fechado = String(!aberto);
-  botao.textContent = aberto ? "Enviar pedido no WhatsApp" : motivoFechado();
+  botao.textContent = aberto ? (MESA_ATUAL ? "Enviar para a cozinha" : "Enviar pedido no WhatsApp") : motivoFechado();
 }
 
 function statusLoja() {
@@ -1251,6 +1311,7 @@ function statusLoja() {
   const peloHorario = !fechadoHoje && (h >= LOJA.abre && h < LOJA.fecha);
   const aberto = lojaNoManual === null ? peloHorario : lojaNoManual;
   travarEnvio();
+  if (!selo || !txt) return;   // restaurante.html não tem esse selo na tela
 
   selo.dataset.aberto = String(aberto);
   txt.textContent = aberto
