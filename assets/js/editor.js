@@ -20,7 +20,9 @@ function edEscapa(s) {
     ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
 }
 
-/* o item com os ajustes do dono já aplicados */
+/* o item com os ajustes do dono já aplicados.
+   Pizza (broto/grande) não tem preço único (".p"), então o preço mostrado
+   aqui vale só pra item de preço fixo (lanche, pastel, porção, bebida). */
 function itemAjustado(i) {
   const a = window.ajustes[i.id] || {};
   return {
@@ -29,7 +31,8 @@ function itemAjustado(i) {
     d: a.d != null ? a.d : (i.d || ""),
     f: a.f || i.f || "",
     foto: a.foto || "",          // foto trocada pelo dono (fica guardada no servidor)
-    off: a.off === true
+    off: a.off === true,
+    ehPizzaTam: !!(i.t && typeof i.p !== "number")
   };
 }
 
@@ -96,10 +99,15 @@ function edDesenharLista() {
       </div>
 
       <div class="ed-lado">
-        <label class="ed-preco">
-          <span>Preço</span>
-          <input type="text" inputmode="decimal" value="${v.p.toFixed(2).replace(".", ",")}" data-ed-campo="p" />
-        </label>
+        ${v.ehPizzaTam
+          ? `<label class="ed-preco">
+               <span>Preço (broto/grande)</span>
+               <span class="ed-preco-fixo">Editar no cardápio do arquivo</span>
+             </label>`
+          : `<label class="ed-preco">
+               <span>Preço</span>
+               <input type="text" inputmode="decimal" value="${Number(v.p || 0).toFixed(2).replace(".", ",")}" data-ed-campo="p" />
+             </label>`}
         <button type="button" class="ed-estoque ${v.off ? "fora" : "tem"}" data-ed-estoque>
           ${v.off ? "Esgotado" : "Disponível"}
         </button>
