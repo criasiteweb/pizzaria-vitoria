@@ -17,6 +17,8 @@ let comandas = [];
 let atual = 0;
 let grupoAberto = "todos";
 let busca = "";
+let mmAtivo = false;      // "meio a meio" ligado no balcão
+let mmPrimeiro = null;    // { ref, tam } do 1º sabor escolhido, esperando o 2º
 
 /* ========================= guardar e ler ========================= */
 function salvar() {
@@ -157,11 +159,14 @@ function desenharItens() {
   });
 
   alvo.innerHTML = botoes.length
-    ? botoes.map(i => `
-      <button type="button" class="cmd-item" data-add="${i.id}">
+    ? botoes.map(i => {
+        const escolhido = mmPrimeiro && i.id === `${mmPrimeiro.ref}@${mmPrimeiro.tam}`;
+        return `
+      <button type="button" class="cmd-item${escolhido ? " escolhido" : ""}" data-add="${i.id}">
         <span>${escapa(i.n)}</span>
         <b>${reais(i.p)}</b>
-      </button>`).join("")
+      </button>`;
+      }).join("")
     : `<p class="cmd-vazio">Nenhum item com esse nome.</p>`;
 }
 
@@ -185,7 +190,54 @@ function recalcular() {
   p.subtotal = p.itens.reduce((s, l) => s + l.total, 0);
 }
 
+/* Meio a meio no balcão: clica em 2 sabores do mesmo tamanho e combina
+   num item só, com o preço do mais caro (+ R$ 1 no broto, mesma regra
+   do site). Pedido do Matheus em 25/09/2026: o balcão tinha só pizza
+   inteira, sem essa opção. */
+function tentarMeioAMeio(id) {
+  if (!mmAtivo || !String(id).includes("@")) return false;
+  const [ref, tam] = String(id).split("@");
+
+  if (!mmPrimeiro) {
+    mmPrimeiro = { ref, tam };
+    desenharItens();
+    return true;
+  }
+  if (mmPrimeiro.ref === ref && mmPrimeiro.tam === tam) {
+    mmPrimeiro = null;                 // clicou de novo no mesmo: cancela
+    desenharItens();
+    return true;
+  }
+  if (mmPrimeiro.tam !== tam) {
+    alert("Os dois sabores precisam ser do mesmo tamanho.");
+    return true;
+  }
+
+  const base1 = acharItem(`${mmPrimeiro.ref}@${tam}`);
+  const base2 = acharItem(`${ref}@${tam}`);
+  const sabor1 = (typeof CARDAPIO !== "undefined" ? CARDAPIO : []).find(i => i.id === mmPrimeiro.ref);
+  const sabor2 = (typeof CARDAPIO !== "undefined" ? CARDAPIO : []).find(i => i.id === ref);
+  if (!base1 || !base2) { mmPrimeiro = null; return true; }
+
+  let preco = Math.max(base1.p, base2.p);
+  if (tam === "broto" && typeof TAXA_MEIO_A_MEIO_BROTO !== "undefined") preco += TAXA_MEIO_A_MEIO_BROTO;
+
+  const tamNome = (typeof TAMANHOS !== "undefined" ? TAMANHOS.find(t => t.id === tam) : null);
+  const nome1 = sabor1 ? sabor1.n.replace(/^\d+\s*·\s*/, "") : base1.n;
+  const nome2 = sabor2 ? sabor2.n.replace(/^\d+\s*·\s*/, "") : base2.n;
+
+  const p = comanda().pedido;
+  p.itens.push({
+    ref: "", q: 1, nome: `Pizza ${tamNome ? tamNome.n : tam} · ${nome1} / ${nome2}`,
+    unit: preco, total: preco, lanches: "", adds: "", obs: ""
+  });
+  mmPrimeiro = null;
+  recalcular(); salvar(); desenharComanda(); desenharItens();
+  return true;
+}
+
 function adicionar(id) {
+  if (tentarMeioAMeio(id)) return;
   const item = acharItem(id);
   if (!item) return;
   const p = comanda().pedido;
@@ -445,6 +497,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const g = e.target.closest("[data-grupo]");
     if (g) { grupoAberto = g.dataset.grupo; desenharGrupos(); desenharItens(); return; }
+
+    const mmBt = e.target.closest("[data-mm-toggle]");
+    if (mmBt) {
+      mmAtivo = !mmAtivo;
+      mmPrimeiro = null;
+      mmBt.textContent = mmAtivo ? "Meio a meio: ligado" : "Meio a meio: desligado";
+      mmBt.setAttribute("aria-pressed", String(mmAtivo));
+      const ajuda = $("[data-mm-ajuda]");
+      if (ajuda) ajuda.hidden = !mmAtivo;
+      desenharItens();
+      return;
+    }
 
     const add = e.target.closest("[data-add]");
     if (add) { adicionar(add.dataset.add); return; }
