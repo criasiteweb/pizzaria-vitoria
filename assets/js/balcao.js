@@ -43,9 +43,39 @@ function pedidoVazio() {
   return {
     itens: [], subtotal: 0, taxa: null,
     cliente: "", fone: "", tipo: "Retirada no balcão",
-    endereco: "", pagamento: "", obs: ""
+    endereco: "", pagamento: "", obs: "", mesa: null
   };
 }
+
+/* ========================= pedido chegando da mesa (restaurante.html) =========================
+   O painel escuta "pedidos_mesa" (em painel.js) e chama esta função pra cada
+   pedido novo. Soma na comanda daquela mesa se já estiver aberta, ou abre
+   uma nova. Não mexe na aba que o atendente estiver olhando no momento. */
+window.rbImportarPedidoMesa = function (mesaNum, itens, cliente) {
+  let c = comandas.find(x => x.pedido.tipo === "No restaurante" && x.pedido.mesa === mesaNum);
+  if (!c) {
+    c = {
+      id: Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+      num: numeroComanda(true),
+      pedido: Object.assign(pedidoVazio(), { tipo: "No restaurante", mesa: mesaNum }),
+      forma: "", recebido: "",
+      criada: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    };
+    comandas.push(c);
+  }
+  if (cliente && !c.pedido.cliente) c.pedido.cliente = cliente;
+  (itens || []).forEach(i => {
+    c.pedido.itens.push({
+      ref: "", q: Number(i.qtd) || 1, nome: i.nome, unit: Number(i.preco) || 0, total: 0,
+      lanches: i.escolhas || "", adds: i.adds || "", obs: i.obs || ""
+    });
+  });
+  c.pedido.itens.forEach(l => { l.total = l.unit * l.q; });
+  c.pedido.subtotal = c.pedido.itens.reduce((s, l) => s + l.total, 0);
+  salvar();
+  desenharAbas();
+  if (comanda() === c) desenharComanda();
+};
 
 function novaComanda(redesenhar = true) {
   comandas.push({
@@ -65,6 +95,9 @@ const comanda = () => comandas[atual];
 /* ========================= abas ========================= */
 function tituloAba(c) {
   const p = c.pedido;
+  if (p.tipo === "No restaurante" && p.mesa) {
+    return "Mesa " + p.mesa + (p.cliente ? " · " + p.cliente.split(/\s+/)[0] : "");
+  }
   if (p.cliente) return p.cliente.split(/\s+/)[0];
   const q = p.itens.reduce((s, i) => s + i.q, 0);
   return q ? q + (q === 1 ? " item" : " itens") : "Comanda " + c.num;
