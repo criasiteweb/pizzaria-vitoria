@@ -290,18 +290,33 @@ function montarCardapio() {
       </div>`;
   }).join("");
 
+  let filtroAtivo = "todos";
   filtros.addEventListener("click", e => {
     const b = e.target.closest("button[data-f]");
     if (!b) return;
     $$("button", filtros).forEach(x => x.setAttribute("aria-selected", String(x === b)));
-    const f = b.dataset.f;
-    $$(".grupo", alvo).forEach(g => { g.hidden = f !== "todos" && g.dataset.grupo !== f; });
+    filtroAtivo = b.dataset.f;
+    $$(".grupo", alvo).forEach(g => { g.hidden = filtroAtivo !== "todos" && g.dataset.grupo !== filtroAtivo; });
   });
 
   alvo.addEventListener("click", e => {
     const b = e.target.closest("[data-item]");
     if (b) abrirModal(b.dataset.item);
   });
+
+  /* filtro acompanha a rolagem: só faz sentido quando "Tudo" está
+     selecionado, já que nos outros só uma categoria fica visível */
+  if ("IntersectionObserver" in window) {
+    const observador = new IntersectionObserver(entradas => {
+      if (filtroAtivo !== "todos") return;
+      entradas.forEach(e => {
+        if (!e.isIntersecting) return;
+        const id = e.target.dataset.grupo;
+        $$("button", filtros).forEach(x => x.setAttribute("aria-selected", String(x.dataset.f === id)));
+      });
+    }, { rootMargin: "-100px 0px -72% 0px", threshold: 0 });
+    $$(".grupo", alvo).forEach(g => observador.observe(g));
+  }
 }
 
 /* ================= blocos da montagem da pizza ================= */
