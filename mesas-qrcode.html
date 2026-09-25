@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>QR Code das mesas para imprimir | Pizzaria Vitória</title>
+<link rel="icon" href="assets/img/favicon.png" type="image/png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#0E0E10;color:#EDEAE2;font-family:"Inter",system-ui,sans-serif;padding:28px 18px 60px}
+  .topo{max-width:900px;margin:0 auto 22px;text-align:center}
+  .topo h1{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:28px;margin:0 0 6px;text-transform:uppercase}
+  .topo p{margin:0;opacity:.75;font-size:14px}
+  .grade{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+  .cartao{
+    background:#FFC20E;color:#1a1200;border-radius:22px;padding:22px 18px 18px;
+    text-align:center;break-inside:avoid;page-break-inside:avoid;
+  }
+  .cartao img.logo{width:52px;height:52px;border-radius:50%;margin:0 auto 8px;display:block}
+  .cartao h2{font-family:"Anton",Impact,sans-serif;font-weight:400;font-size:30px;margin:0 0 2px}
+  .cartao .sub{margin:0 0 14px;font-size:13px;font-weight:600}
+  .qr{background:#fff;border-radius:14px;padding:10px;display:inline-block}
+  .qr svg{display:block;width:170px;height:170px}
+  .cartao .rodape{margin:12px 0 0;font-size:11.5px;font-weight:700;opacity:.85}
+  .fora{max-width:900px;margin:26px auto 0;text-align:center;color:rgba(237,234,226,.7);font-size:14px;line-height:1.6}
+  .fora button{
+    margin-top:12px;padding:13px 22px;border-radius:12px;border:0;cursor:pointer;
+    background:#FFC20E;color:#1a1200;font:800 15px/1 "Inter",sans-serif;
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .fora{display:none}
+    .topo{display:none}
+    .grade{gap:14px;padding:14px}
+    .cartao{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <h1>QR Code das mesas</h1>
+  <p>13 cartões, um por mesa. Imprima, recorte e plastifique.</p>
+</div>
+
+<div class="grade" data-grade></div>
+
+<div class="fora">
+  <p>Cada QR Code abre o cardápio já identificando a mesa. Funciona em papel A4 comum.</p>
+  <button type="button" onclick="window.print()">🖨️ Imprimir todas as mesas</button>
+</div>
+
+<script src="assets/js/qrcode-lib.js"></script>
+<script>
+(function () {
+  var base = location.href.replace(/[^/]*$/, "") + "restaurante.html?mesa=";
+  var grade = document.querySelector("[data-grade]");
+  var html = "";
+  for (var n = 1; n <= 13; n++) {
+    html += '<div class="cartao">' +
+      '<img class="logo" src="assets/img/logo.jpg" alt="Pizzaria Vitória" />' +
+      '<h2>Mesa ' + n + '</h2>' +
+      '<p class="sub">Aponte a câmera para pedir</p>' +
+      '<div class="qr" data-qr="' + n + '"></div>' +
+      '<p class="rodape">Pizzaria Vitória</p>' +
+      '</div>';
+  }
+  grade.innerHTML = html;
+  for (var m = 1; m <= 13; m++) {
+    var qr = qrcode(0, "H");   // correção de erro alta: aguenta gordura e amassado na mesa
+    qr.addData(base + m);
+    qr.make();
+    document.querySelector('[data-qr="' + m + '"]').innerHTML = qr.createSvgTag(4);
+  }
+})();
+</script>
+
+</body>
+</html>
