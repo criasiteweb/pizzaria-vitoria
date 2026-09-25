@@ -319,10 +319,15 @@
 </div>
 
 <div class="veu" data-sem-mesa hidden style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#120C0A;color:#F1EBE1;text-align:center;padding:24px">
-  <div>
-    <p style="font-size:1.2rem;font-weight:800">Link incompleto</p>
-    <p>Escaneie o QR Code da sua mesa para abrir o cardápio.</p>
-  </div>
+  <form data-form-mesa style="max-width:280px;width:100%">
+    <img src="assets/img/logo.jpg" alt="Pizzaria Vitória" width="64" height="64" style="border-radius:50%;margin:0 auto 16px;display:block" />
+    <p style="font-size:1.15rem;font-weight:800;margin:0 0 6px">Qual é a sua mesa?</p>
+    <p style="font-size:.85rem;opacity:.7;margin:0 0 16px">Digite o número que está na mesa</p>
+    <input type="number" min="1" max="13" inputmode="numeric" placeholder="Ex.: 7" required
+      style="width:100%;text-align:center;font-size:1.4rem;font-weight:800;padding:.8rem;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#1B1310;color:#F1EBE1;margin-bottom:12px" />
+    <button type="submit" style="width:100%;padding:.9rem;border-radius:999px;border:0;background:#D42A20;color:#fff;font:800 1rem/1 'Inter',sans-serif;cursor:pointer">Entrar</button>
+    <p data-erro-mesa style="color:#E8493C;font-size:.8rem;margin:10px 0 0;display:none">Mesa de 1 a 13, confere o número.</p>
+  </form>
 </div>
 
 <script>
@@ -336,7 +341,17 @@
 (function(){
   var m = new URLSearchParams(location.search).get("mesa");
   if (!m || !/^([1-9]|1[0-3])$/.test(m)) {
-    document.querySelector("[data-sem-mesa]").hidden = false;
+    var veu = document.querySelector("[data-sem-mesa]");
+    veu.hidden = false;
+    document.querySelector("[data-form-mesa]").addEventListener("submit", function(e){
+      e.preventDefault();
+      var v = e.target.querySelector("input").value.trim();
+      if (!/^([1-9]|1[0-3])$/.test(v)) {
+        document.querySelector("[data-erro-mesa]").style.display = "block";
+        return;
+      }
+      location.href = location.pathname + "?mesa=" + v;
+    });
     return;
   }
   document.querySelectorAll("[data-mesa-titulo]").forEach(function(e){ e.textContent = "Mesa " + m; });
