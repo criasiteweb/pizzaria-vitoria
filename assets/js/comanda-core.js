@@ -15,10 +15,10 @@
    ========================================================= */
 
 const LOJA = {
-  nome: "REI BURGÃO LANCHES",
-  endereco: "R. Eunice Cerqueira Innocencio, 245",
-  bairro: "Jd. Quaresmeira — Suzano/SP",
-  fone: "(11) 97638-5099",
+  nome: "PIZZARIA VITÓRIA",
+  endereco: "Rua Pedro Rípoli, 104",
+  bairro: "Barro Branco — Ribeirão Pires/SP",
+  fone: "(11) 97386-4010",
   colunas: 48,                          // 80mm na fonte padrão = 48 colunas
   rawbt: "ru.a402d.rawbtprinter"        // pacote do app RawBT
 };
