@@ -157,8 +157,17 @@ function taxaAtual() {
 }
 
 
+/* Data no fuso do aparelho (Brasília). Com toISOString() a numeração da
+   comanda zerava às 21h, no meio do expediente, porque lá já era o dia
+   seguinte. */
+function diaISOComanda() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+    "-" + String(d.getDate()).padStart(2, "0");
+}
+
 function numeroComanda(novo) {
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = diaISOComanda();
   let s = { dia: hoje, n: 0 };
   try { s = JSON.parse(localStorage.getItem("rb_comanda_seq")) || s; } catch (e) {}
   if (s.dia !== hoje) s = { dia: hoje, n: 0 };
