@@ -114,11 +114,23 @@ const LOJA = {
         "Vila Verde": 10.00,
         "Vila Belmiro": 12.00
       },
-      /* Suzano confirmado pelo dono em 25/09/2026: também entregam lá,
-         sem tabela fixa de bairro (a taxa vem do cálculo por distância
-         logo abaixo). Precisa existir aqui pra aparecer no seletor de
-         cidade e pro CEP de Suzano preencher a rua sozinho. */
-      "Suzano": {}
+      /* Suzano confirmado pelo dono em 25/09/2026: também entregam lá.
+         Bairros da região de Palmeiras conferidos por CEP real
+         (25/09/2026), todos R$17. Fora desses, o cálculo por distância
+         logo abaixo cobre o resto (cidade continua aparecendo mesmo
+         sem bairro certo, pra CEP de Suzano preencher a rua sozinho). */
+      "Suzano": {
+        "Jardim Ana Rosa (Palmeiras)": 17.00,
+        "Recreio Rio Bonito": 17.00,
+        "Vila Fátima": 17.00,
+        "Parque Buenos Aires": 17.00,
+        "Jardim Ikeda": 17.00,
+        "Jardim Palmeiras": 17.00,
+        "Parque Palmeiras": 17.00,
+        "Vila Rica": 17.00,
+        "Jardim Amazonas": 17.00,
+        "Ipelândia": 17.00
+      }
     },
 
     /* =====================================================
