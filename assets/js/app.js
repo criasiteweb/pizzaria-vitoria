@@ -360,16 +360,23 @@ function blocoSabores(it) {
     </div>`;
   }
   const lista = todosSaboresPizza().filter(s => s.id !== it.id);
+  const salgadas = lista.filter(s => s.g === "salgadas");
+  const doces = lista.filter(s => s.g === "doces");
+  const opcoesSabor = `
+    <option value="">Não quero, só ${it.n}</option>
+    ${salgadas.length ? `<optgroup label="Pizza salgada">
+      ${salgadas.map(s => `<option value="${s.id}">${s.n} — ${reais(s.t[t.id])}</option>`).join("")}
+    </optgroup>` : ""}
+    ${doces.length ? `<optgroup label="Pizza doce">
+      ${doces.map(s => `<option value="${s.id}">${s.n} — ${reais(s.t[t.id])}</option>`).join("")}
+    </optgroup>` : ""}`;
   return `<div class="extras-bloco">
     <p class="extras-titulo">Meio a meio</p>
     <p class="extras-ajuda">O tamanho ${t.n} aceita até ${t.sabores} sabores. Você paga o preço do sabor mais caro, sem taxa nenhuma a mais.</p>
     <div class="sabor-fixo"><b>1º sabor</b><span>${it.n}</span></div>
     ${Array.from({ length: t.sabores - 1 }, (_, k) => `
       <label class="escolha">${k + 2}º sabor <small>(opcional)</small>
-        <select data-sabor>
-          <option value="">Não quero, só ${it.n}</option>
-          ${lista.map(s => `<option value="${s.id}">${s.n} — ${reais(s.t[t.id])}</option>`).join("")}
-        </select>
+        <select data-sabor>${opcoesSabor}</select>
       </label>`).join("")}
   </div>`;
 }
