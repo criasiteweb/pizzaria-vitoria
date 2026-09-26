@@ -301,8 +301,13 @@
 .balcao .guia ol{margin:12px 0 0;padding-left:20px;font-size:13.5px;line-height:1.6;color:var(--texto-suave)}
 .balcao .guia a{color:var(--amarelo)}
 
-/* o papel fica escondido, menos quando a aba Balcão está aberta */
-body.ver-papel .papel{position:static;left:auto;margin:0 auto}
+/* o papel fica escondido, menos quando a aba Balcão está aberta.
+   Só na tela (@media screen): impresso de verdade, essa regra tinha
+   mais força que o "margin:0" da folha de impressão e centralizava o
+   papel, cortando a lateral esquerda na impressora térmica. */
+@media screen{
+  body.ver-papel .papel{position:static;left:auto;margin:0 auto}
+}
 .pedido .t-mesa{color:var(--amarelo-forte)}
 
 
