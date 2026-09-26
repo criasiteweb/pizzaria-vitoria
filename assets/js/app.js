@@ -303,6 +303,11 @@ function montarCardapio() {
     $$("button", filtros).forEach(x => x.setAttribute("aria-selected", String(x === b)));
     filtroAtivo = b.dataset.f;
     $$(".grupo", alvo).forEach(g => { g.hidden = filtroAtivo !== "todos" && g.dataset.grupo !== filtroAtivo; });
+    /* depois de filtrar, a página encolhe (grupos escondidos somem),
+       então rola até o topo do grupo escolhido pra não sobrar no final
+       da página com a posição de rolagem antiga */
+    const destino = filtroAtivo === "todos" ? alvo : $(`.grupo[data-grupo="${filtroAtivo}"]`, alvo);
+    if (destino) destino.scrollIntoView({ block: "start", behavior: "smooth" });
   });
 
   alvo.addEventListener("click", e => {
