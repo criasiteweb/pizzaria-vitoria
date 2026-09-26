@@ -974,8 +974,12 @@ els("[data-filtro]").forEach(b => b.addEventListener("click", () => {
   if (filtro === "balcao" || filtro === "cardapio") { desenhar(); return; }
   if (filtro === "caixa") {
     const campo = el("[data-data]");
-    if (!campo.value) campo.value = hojeISO();
-    dataHistorico = campo.value === hojeISO() ? null : campo.value;
+    const hoje = hojeISO();
+    /* se o painel ficou aberto passando da meia-noite, o campo de data
+       não pode continuar travado no dia anterior — só mantém uma data
+       diferente de hoje se o dono escolheu ela de propósito (dataHistorico) */
+    if (!dataHistorico) campo.value = hoje;
+    dataHistorico = campo.value === hoje ? null : campo.value;
     (async () => {
       if (dataHistorico) await carregarHistorico(dataHistorico); else escutarPedidos();
       await carregarCaixa(campo.value);
